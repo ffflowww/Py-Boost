@@ -583,6 +583,44 @@ node_index_kernel = cp.ElementwiseKernel(
 
     'node_index_kernel')
 
+new_tree_prediction_kernel = cp.RawKernel(
+    r'''
+    extern "C" __global__
+    void new_tree_prediction_kernel(
+        const float* X,
+        const float4* tree,
+        const int tree_size,
+        const float* values,
+        const int n_features,
+        const int n_out,
+        float* res)
+    {
+        int i_ = blockIdx.x * blockDim.y + threadIdx.y;
+        int j_ = threadIdx.x;
+
+        int x_feat_offset = n_features * i_;
+        int tree_offset = tree_size * j_;
+
+        int n_node = 0;
+        float4 nd;
+        float x;
+
+        //while (n_node >= 0) {
+        for (int ii=0; ii < 6; ii++) {
+            nd = tree[tree_offset + n_node];
+
+            x = X[x_feat_offset + (int)nd.x];
+
+            n_node = (int)nd.z;
+            if (x > nd.y) {
+                n_node = (int)nd.w;
+            }
+        }
+        res[i_ * n_out + j_] += values[((-n_node) * n_out) + j_];
+    }
+    ''',
+    'new_tree_prediction_kernel')
+
 
 def get_tree_node(arr, feats, val_splits, split, nan_left):
     n_gr, nf = feats.shape
