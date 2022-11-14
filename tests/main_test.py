@@ -18,7 +18,7 @@ def test_reg(target_splitter, batch_size):
     X_test, y_test = X_[:3840000], y_[:3840000]
 
     model = GradientBoosting('mse', 'r2_score',
-                             ntrees=500, lr=.01, verbose=5, es=200, lambda_l2=1,
+                             ntrees=10, lr=.01, verbose=5, es=200, lambda_l2=1,
                              subsample=.8, colsample=.8, min_data_in_leaf=10, min_gain_to_split=0,
                              max_bin=256, max_depth=6, target_splitter=target_splitter)
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test}, ])
