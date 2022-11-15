@@ -46,6 +46,7 @@ if __name__ == '__main__':
     pc = True
     # pc = False
 
+
     with nvtx.annotate("Test case 1"):
         if pc:
             test_reg("OneVsAll", batch_size=320000, pc=pc)
