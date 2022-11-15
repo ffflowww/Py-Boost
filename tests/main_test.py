@@ -15,7 +15,7 @@ def test_reg(target_splitter, batch_size, pc=False):
     X, y = make_regression(2420000, 100, n_targets=3, random_state=42)
     if pc:
         X_test, y_test = X[:1920000], y[:1920000]
-        trees = 200
+        trees = 160
         X, y = X[-500000:], y[-500000:]
     else:
         X_test, y_test = X[:192000], y[:192000]
