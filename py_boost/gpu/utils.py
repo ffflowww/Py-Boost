@@ -604,19 +604,25 @@ new_tree_prediction_kernel = cp.RawKernel(
         int n_node = 0;
         float4 nd;
         float x;
-
-        //while (n_node >= 0) {
-        for (int ii=0; ii < 6; ii++) {
+        int n_feat_raw;
+        
+        while (n_node >= 0) {
             nd = tree[tree_offset + n_node];
-
-            x = X[x_feat_offset + (int)nd.x];
-
-            n_node = (int)nd.z;
-            if (x > nd.y) {
-                n_node = (int)nd.w;
+            
+            n_feat_raw = (int)nd.x;
+            //x = X[x_feat_offset + (int)nd.x];
+            x = X[x_feat_offset + abs(n_feat_raw) - 1];
+            
+            if (isnan(x)) {
+                n_node = (n_feat_raw > 0) ? (int)nd.w : (int)nd.z;
+            } else {
+                n_node = (x > nd.y) ? (int)nd.w : (int)nd.z;
             }
+        
         }
-        res[i_ * n_out + j_] += values[((-n_node) * n_out) + j_];
+        
+        res[i_ * n_out + j_] += values[((-n_node - 1) * n_out) + j_];
+        //atomicAdd(&res[i_ * n_out + j_], values[((-n_node - 1) * n_out) + j_]);
     }
     ''',
     'new_tree_prediction_kernel')
