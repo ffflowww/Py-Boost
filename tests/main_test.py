@@ -12,15 +12,15 @@ import pickle
 
 
 def test_reg(target_splitter, batch_size, pc=False):
-    X, y = make_regression(1970000, 100, n_targets=3, random_state=42)
+    X, y = make_regression(2420000, 100, n_targets=3, random_state=42)
     if pc:
         X_test, y_test = X[:1920000], y[:1920000]
-        trees = 500
+        trees = 600
+        X, y = X[-500000:], y[-500000:]
     else:
         X_test, y_test = X[:192000], y[:192000]
-        trees = 20
-
-    X, y = X[-50000:], y[-50000:]
+        trees = 50
+        X, y = X[-50000:], y[-50000:]
     model = GradientBoosting('mse', 'r2_score',
                              ntrees=trees, lr=.01, verbose=5, es=200, lambda_l2=1,
                              subsample=.8, colsample=.8, min_data_in_leaf=10, min_gain_to_split=0,
@@ -45,8 +45,8 @@ def test_reg(target_splitter, batch_size, pc=False):
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
     print(os.environ['CONDA_DEFAULT_ENV'])
-    pc = True
-    # pc = False
+    # pc = True
+    pc = False
 
 
     with nvtx.annotate("Test case 1"):

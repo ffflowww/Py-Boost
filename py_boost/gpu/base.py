@@ -123,7 +123,14 @@ class Ensemble:
 
             for i in range(new_format.shape[0]):
                 for j in range(new_format.shape[1]):
-                    assert tree.feats[i][j] >= 0
+                    if tree.feats[i][j] < 0:
+                        print(tree.feats[i][j])
+                        print(tree.feats[i])
+                        print(tree.val_splits[i])
+                        print(tree.split[i])
+                        print(tree.leaves)
+                        print(i, j)
+                        exit()
                     if tree.nans[i][j] is False:
                         new_format[i][j]['feat'] = tree.feats[i][j] + 1
                     else:
