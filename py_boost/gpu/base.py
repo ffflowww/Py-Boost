@@ -129,7 +129,7 @@ class Ensemble:
                         print(tree.val_splits[i])
                         print(tree.split[i])
                         print(tree.leaves)
-                        print(i, j)
+                        print(n, i, j)
                         exit()
                     if tree.nans[i][j] is False:
                         new_format[i][j]['feat'] = tree.feats[i][j] + 1
