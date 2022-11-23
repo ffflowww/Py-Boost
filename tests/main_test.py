@@ -19,7 +19,7 @@ def test_reg(target_splitter, batch_size, pc=False):
         X, y = X[-50000:], y[-50000:]
     else:
         X_test, y_test = X[:192000], y[:192000]
-        trees = 200
+        trees = 20
         X, y = X[-50000:], y[-50000:]
     model = GradientBoosting('mse', 'r2_score',
                              ntrees=trees, lr=.01, verbose=5, es=200, lambda_l2=1,
@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     with nvtx.annotate("Test case 1"):
         if pc:
-            test_reg("OneVsAll", batch_size=3333, pc=pc)
+            test_reg("OneVsAll", batch_size=8888, pc=pc)
         else:
             test_reg("OneVsAll", batch_size=3333, pc=pc)
             # test_reg("Single", batch_size=8000, pc=pc)

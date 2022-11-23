@@ -183,9 +183,12 @@ class Tree:
             if ngroups >= 512:
                 return (nrows,), (ngroups, 1)
             nr = 512 // ngroups
-            while nrows % nr > 0:
-                nr -= 1
-            return (nrows // nr,), (ngroups, nr)
+            if nrows > nr:
+                while nrows % nr > 0:
+                    nr -= 1
+                return (nrows // nr,), (ngroups, nr)
+            else:
+                return (nrows,), (ngroups, 1)  # not optimal for sure
 
         blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
 
