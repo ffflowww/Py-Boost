@@ -12,9 +12,9 @@ import pickle
 
 
 def test_reg(target_splitter, batch_size, pc=False):
-    X, y = make_regression(2420000, 100, n_targets=5, random_state=42)
+    X, y = make_regression(1000000, 100, n_targets=5, random_state=42)
     if pc:
-        X_test, y_test = X[:1920000], y[:1920000]
+        X_test, y_test = X[:950000], y[:950000]
         trees = 300
         X, y = X[-50000:], y[-50000:]
     else:
@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     with nvtx.annotate("Test case 1"):
         if pc:
-            test_reg("OneVsAll", batch_size=8888, pc=pc)
+            test_reg("OneVsAll", batch_size=4444, pc=pc)
         else:
             test_reg("OneVsAll", batch_size=3333, pc=pc)
             # test_reg("Single", batch_size=8000, pc=pc)
