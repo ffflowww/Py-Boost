@@ -178,8 +178,6 @@ class Tree:
         return apply_values(nodes, cp.arange(self.ngroups, dtype=cp.uint64), self.leaves)
 
     def predict_from_new_kernel(self, X, res):
-        print("@@@")
-        print(X.shape)
         def get_optimal_cuda_params(nrows, ngroups):
             assert ngroups <= 1024
             if ngroups >= 512:
@@ -194,9 +192,7 @@ class Tree:
 
         blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
 
-
-        print(blocks, threads)
-        print(X.shape, self.ngroups)
+        print(blocks, threads, X.shape, self.ngroups)
 
         new_tree_prediction_kernel(blocks, threads, ((X,
                                                       self.new_format,
