@@ -192,9 +192,9 @@ class Ensemble:
 
         if int(np.floor(X.shape[0] / batch_size)) == 0:
             with nvtx.annotate(f"copying last1"):
-                with map_streams[0] as stream:
+                with map_streams[last_n_stream] as stream:
                     stream.synchronize()
-                    cpu_pred_full[:] = cpu_pred[0][:last_batch_size]
+                    cpu_pred_full[:last_batch_size] = cpu_pred[last_n_stream][:last_batch_size]
         else:
             with nvtx.annotate(f"copying last2"):
                 with map_streams[1 - last_n_stream] as stream:
