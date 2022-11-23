@@ -12,7 +12,7 @@ import pickle
 
 
 def test_reg(target_splitter, batch_size, pc=False):
-    X, y = make_regression(2420000, 100, n_targets=10, random_state=42)
+    X, y = make_regression(2420000, 100, n_targets=5, random_state=42)
     if pc:
         X_test, y_test = X[:1920000], y[:1920000]
         trees = 500
@@ -54,15 +54,15 @@ def test_reg(target_splitter, batch_size, pc=False):
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
     print(os.environ['CONDA_DEFAULT_ENV'])
-    # pc = True
-    pc = False
+    pc = True
+    # pc = False
 
 
     with nvtx.annotate("Test case 1"):
         if pc:
-            test_reg("OneVsAll", batch_size=300000, pc=pc)
+            test_reg("OneVsAll", batch_size=75000, pc=pc)
         else:
-            test_reg("OneVsAll", batch_size=7300, pc=pc)
+            test_reg("OneVsAll", batch_size=3333, pc=pc)
             # test_reg("Single", batch_size=8000, pc=pc)
 
     print("Finish tests")
