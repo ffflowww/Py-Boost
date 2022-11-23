@@ -3,7 +3,8 @@
 import cupy as cp
 import numpy as np
 
-from .utils import apply_values, depthwise_grow_tree, get_tree_node, set_leaf_values, calc_node_values, new_tree_prediction_kernel, new_tree_prediction_kernel2
+from .utils import apply_values, depthwise_grow_tree, get_tree_node, set_leaf_values, calc_node_values, \
+    new_tree_prediction_kernel
 
 
 class Tree:
@@ -177,20 +178,26 @@ class Tree:
         return apply_values(nodes, cp.arange(self.ngroups, dtype=cp.uint64), self.leaves)
 
     def predict_from_new_kernel(self, X, res):
-        n_rows = X.shape[0]
-        n_features = X.shape[1]
-        n_out = self.nout
-        n_gr = self.ngroups
+        def get_optimal_cuda_params(nrows, ngroups):
+            assert ngroups <= 1024
+            if ngroups >= 512:
+                return (nrows,), (ngroups, 1)
+            nr = 512 // ngroups
+            while nrows % nr > 0:
+                nr -= 1
+            return (nrows // nr,), (ngroups, nr)
 
-        new_tree_prediction_kernel2((n_rows // 32,), (n_gr, 32), ((X,
-                                                                  self.new_format,
-                                                                  self.new_format_offsets,
-                                                                  self.values,
-                                                                  self.new_out_sizes,
-                                                                  self.new_out_indexes,
-                                                                  n_features,
-                                                                  n_out,
-                                                                  res)))
+        blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
+
+        new_tree_prediction_kernel(blocks, threads, ((X,
+                                                      self.new_format,
+                                                      self.new_format_offsets,
+                                                      self.values,
+                                                      self.new_out_sizes,
+                                                      self.new_out_indexes,
+                                                      X.shape[1],
+                                                      self.nout,
+                                                      res)))
 
     def predict(self, X):
         """Predict from the feature matrix X

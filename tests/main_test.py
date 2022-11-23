@@ -12,14 +12,14 @@ import pickle
 
 
 def test_reg(target_splitter, batch_size, pc=False):
-    X, y = make_regression(2420000, 100, n_targets=5, random_state=42)
+    X, y = make_regression(2420000, 100, n_targets=10, random_state=42)
     if pc:
         X_test, y_test = X[:1920000], y[:1920000]
-        trees = 160
-        X, y = X[-500000:], y[-500000:]
+        trees = 500
+        X, y = X[-50000:], y[-50000:]
     else:
         X_test, y_test = X[:192000], y[:192000]
-        trees = 10
+        trees = 20
         X, y = X[-50000:], y[-50000:]
     model = GradientBoosting('mse', 'r2_score',
                              ntrees=trees, lr=.01, verbose=5, es=200, lambda_l2=1,
@@ -60,9 +60,9 @@ if __name__ == '__main__':
 
     with nvtx.annotate("Test case 1"):
         if pc:
-            test_reg("OneVsAll", batch_size=320000, pc=pc)
+            test_reg("OneVsAll", batch_size=300000, pc=pc)
         else:
-            test_reg("OneVsAll", batch_size=8000, pc=pc)
+            test_reg("OneVsAll", batch_size=7300, pc=pc)
             # test_reg("Single", batch_size=8000, pc=pc)
 
     print("Finish tests")

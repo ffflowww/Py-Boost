@@ -101,65 +101,31 @@ class Ensemble:
         # new tree format
         # if left/right node is negative it means that it shows index in values array
 
-        # names = ['feat', 'split_val', 'left_node', 'right_node']
-        # types = [np.int32, np.float32, np.int32, np.int32]
-        # custom_node = np.dtype({'names': names, 'formats': types})
-
         n_gr = self.models[0].ngroups
         for n, tree in enumerate(self.models):
-
-            # new_format = np.zeros((n_gr, 63), dtype=custom_node)
             nf = np.zeros(n_gr * 63 * 4, dtype=np.float32)
-
             gr_subtree_offsets = np.zeros(n_gr, dtype=np.int32)
-
             for i in range(n_gr):
                 gr_subtree_size = (tree.feats[i] >= 0).sum()
                 if i < n_gr - 1:
                     gr_subtree_offsets[i + 1] = gr_subtree_offsets[i] + gr_subtree_size
 
                 for j in range(gr_subtree_size):
-                    # for j in range(63):
-                    # if tree.feats[i][j] < 0:
-                    #     print(tree.feats[i][j])
-                    #     print(tree.feats[i])
-                    #     print(tree.val_splits[i])
-                    #     print(tree.split[i])
-                    #     print(tree.leaves)
-                    #     print(n, i, j)
-                    #     exit()
                     if tree.nans[i][j] is False:
-                        # new_format[i][j]['feat'] = tree.feats[i][j] + 1
                         nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j] + 1)
                     else:
-                        # new_format[i][j]['feat'] = -(tree.feats[i][j] + 1)
                         nf[4 * (gr_subtree_offsets[i] + j)] = float(-(tree.feats[i][j] + 1))
-                    # new_format[i][j]['split_val'] = tree.val_splits[i][j]
-                    # new_format[i][j]['left_node'] = tree.split[i][j][0]
-                    # new_format[i][j]['right_node'] = tree.split[i][j][1]
                     nf[4 * (gr_subtree_offsets[i] + j) + 1] = tree.val_splits[i][j]
                     nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(tree.split[i][j][0])
                     nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(tree.split[i][j][1])
                     ln = tree.split[i][j][0]
                     rn = tree.split[i][j][1]
 
-                    # ln, rn = new_format[i][j]['left_node'], new_format[i][j]['right_node']
-
                     if tree.feats[i][ln] < 0:
-                        # new_format[i][j]['left_node'] = -(tree.leaves[ln][i] + 1)
                         nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(-(tree.leaves[ln][i] + 1))
                     if tree.feats[i][rn] < 0:
-                        # new_format[i][j]['right_node'] = -(tree.leaves[rn][i] + 1)
                         nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(-(tree.leaves[rn][i] + 1))
 
-            # for h in range(n_gr):
-            #     for k in range(63):
-            #         nf[4 * (h * 63 + k)] = float(new_format[h][k]['feat'])
-            #         nf[4 * (h * 63 + k) + 1] = new_format[h][k]['split_val']
-            #         nf[4 * (h * 63 + k) + 2] = float(new_format[h][k]['left_node'])
-            #         nf[4 * (h * 63 + k) + 3] = float(new_format[h][k]['right_node'])
-
-            print(f"offsets: {gr_subtree_offsets}")
             tree.new_format = cp.array(nf, dtype=cp.float32)
             tree.new_format_offsets = cp.array(gr_subtree_offsets, dtype=cp.int32)
 
@@ -173,8 +139,6 @@ class Ensemble:
                         ni.append(en)
             tree.new_out_sizes = cp.array(ns, dtype=cp.int32)
             tree.new_out_indexes = cp.array(ni, dtype=cp.int32)
-            print(tree.new_out_sizes.get())
-            print(tree.new_out_indexes.get())
 
     def predict_new(self, X, batch_size=100000):
         self.to_device()
