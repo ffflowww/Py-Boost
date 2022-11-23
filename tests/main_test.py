@@ -54,8 +54,8 @@ def test_reg(target_splitter, batch_size, pc=False):
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
     print(os.environ['CONDA_DEFAULT_ENV'])
-    pc = True
-    # pc = False
+    # pc = True
+    pc = False
 
 
     with nvtx.annotate("Test case 1"):
