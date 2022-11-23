@@ -15,7 +15,7 @@ def test_reg(target_splitter, batch_size, pc=False):
     X, y = make_regression(2420000, 100, n_targets=5, random_state=42)
     if pc:
         X_test, y_test = X[:1920000], y[:1920000]
-        trees = 500
+        trees = 300
         X, y = X[-50000:], y[-50000:]
     else:
         X_test, y_test = X[:192000], y[:192000]
@@ -54,8 +54,8 @@ def test_reg(target_splitter, batch_size, pc=False):
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
     print(os.environ['CONDA_DEFAULT_ENV'])
-    # pc = True
-    pc = False
+    pc = True
+    # pc = False
 
 
     with nvtx.annotate("Test case 1"):
