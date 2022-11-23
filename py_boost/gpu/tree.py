@@ -3,7 +3,7 @@
 import cupy as cp
 import numpy as np
 
-from .utils import apply_values, depthwise_grow_tree, get_tree_node, set_leaf_values, calc_node_values, new_tree_prediction_kernel
+from .utils import apply_values, depthwise_grow_tree, get_tree_node, set_leaf_values, calc_node_values, new_tree_prediction_kernel, new_tree_prediction_kernel2
 
 
 class Tree:
@@ -59,6 +59,9 @@ class Tree:
         self.max_leaves = None
 
         self.new_format = None
+        self.new_format_offsets = None
+        self.new_out_indexes = None
+        self.new_out_sizes = None
 
     def set_nodes(self, group, unique_nodes, new_nodes_id, best_feat, best_gain, best_split, best_nan_left):
         """Write info about new nodes
@@ -175,17 +178,16 @@ class Tree:
 
     def predict_from_new_kernel(self, X, res):
         n_rows = X.shape[0]
-        n_out = 3
-        n_gr = 3
         n_features = X.shape[1]
+        n_out = self.nout
+        n_gr = self.ngroups
 
-        # print(self.feats.dtype, self.val_splits.dtype, self.split.dtype, self.nans.dtype, self.leaves.dtype, self.values.dtype)
-        # print(self.feats.shape, self.val_splits.shape, self.split.shape, self.nans.shape, self.leaves.shape,self.values.shape)
-
-        new_tree_prediction_kernel((n_rows // 32,), (n_gr, 32), ((X,
+        new_tree_prediction_kernel2((n_rows // 32,), (n_gr, 32), ((X,
                                                                   self.new_format,
-                                                                  63,
+                                                                  self.new_format_offsets,
                                                                   self.values,
+                                                                  self.new_out_sizes,
+                                                                  self.new_out_indexes,
                                                                   n_features,
                                                                   n_out,
                                                                   res)))

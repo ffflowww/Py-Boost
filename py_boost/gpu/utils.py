@@ -583,6 +583,58 @@ node_index_kernel = cp.ElementwiseKernel(
 
     'node_index_kernel')
 
+new_tree_prediction_kernel2 = cp.RawKernel(
+    r'''
+    extern "C" __global__
+    void new_tree_prediction_kernel2(
+        const float* X,
+        const float4* tree,
+        const int* gr_subtree_offsets,
+        const float* values,
+        const int* gr_out_sizes,
+        const int* gr_out_indexes,
+        const int n_features,
+        const int n_out,
+        float* res)
+    {
+        int i_ = blockIdx.x * blockDim.y + threadIdx.y;
+        int j_ = threadIdx.x;
+
+        int x_feat_offset = n_features * i_;
+        int tree_offset = gr_subtree_offsets[j_];
+
+        int n_node = 0;
+        float4 nd;
+        float x;
+        int n_feat_raw;
+
+        while (n_node >= 0) {
+            nd = tree[tree_offset + n_node];
+
+            n_feat_raw = (int)nd.x;
+            //x = X[x_feat_offset + (int)nd.x];
+            x = X[x_feat_offset + abs(n_feat_raw) - 1];
+
+            if (isnan(x)) {
+                n_node = (n_feat_raw > 0) ? (int)nd.w : (int)nd.z;
+            } else {
+                n_node = (x > nd.y) ? (int)nd.w : (int)nd.z;
+            }
+
+        }
+        
+        int i_out_offset = i_ * n_out;
+        int i_out = gr_out_sizes[j_];
+        int i_out_end = gr_out_sizes[j_ + 1];
+        while(i_out < i_out_end) {
+            res[i_out_offset + gr_out_indexes[i_out]] += values[((-n_node - 1) * n_out) + gr_out_indexes[i_out]];
+            ++i_out;
+        }
+    }
+    ''',
+    'new_tree_prediction_kernel2')
+
+
 new_tree_prediction_kernel = cp.RawKernel(
     r'''
     extern "C" __global__
@@ -621,8 +673,11 @@ new_tree_prediction_kernel = cp.RawKernel(
         
         }
         
+        //for(int i_gr=0; i_gr < 3; ++i_gr) {
+        //    res[i_ * n_out + i_gr] += values[((-n_node - 1) * n_out) + i_gr];
+        //}
+        
         res[i_ * n_out + j_] += values[((-n_node - 1) * n_out) + j_];
-        //atomicAdd(&res[i_ * n_out + j_], values[((-n_node - 1) * n_out) + j_]);
     }
     ''',
     'new_tree_prediction_kernel')

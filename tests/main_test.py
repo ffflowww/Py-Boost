@@ -12,14 +12,14 @@ import pickle
 
 
 def test_reg(target_splitter, batch_size, pc=False):
-    X, y = make_regression(2420000, 100, n_targets=3, random_state=42)
+    X, y = make_regression(2420000, 100, n_targets=5, random_state=42)
     if pc:
         X_test, y_test = X[:1920000], y[:1920000]
         trees = 160
         X, y = X[-500000:], y[-500000:]
     else:
         X_test, y_test = X[:192000], y[:192000]
-        trees = 50
+        trees = 10
         X, y = X[-50000:], y[-50000:]
     model = GradientBoosting('mse', 'r2_score',
                              ntrees=trees, lr=.01, verbose=5, es=200, lambda_l2=1,
@@ -27,26 +27,35 @@ def test_reg(target_splitter, batch_size, pc=False):
                              max_bin=256, max_depth=6, target_splitter=target_splitter)
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test}, ])
 
+    print("Reformatting")
+    with nvtx.annotate("reformatting"):
+        model.create_new_format()
+
+    # exit()
+
+    print("Testing orig prob...")
+    with nvtx.annotate("pred orig prob"):
+        model.predict(X_test[:32*32], batch_size=batch_size)
     print("Testing orig...")
     with nvtx.annotate("pred orig"):
         yy = model.predict(X_test, batch_size=batch_size)
-    # np.savetxt("out_orig.txt", yy)
 
+    print("Testing new prob...")
+    with nvtx.annotate("pred new prob"):
+        model.predict_new(X_test[:32*32], batch_size=batch_size)
     print("Testing new...")
     with nvtx.annotate("pred new"):
         yy2 = model.predict_new(X_test, batch_size=batch_size)
-    # np.savetxt("out_new.txt", yy2)
 
     diff = yy - yy2
     print(f"Outs diff: {diff.sum()}")
-    # np.savetxt("diff.txt", diff)
 
 
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
     print(os.environ['CONDA_DEFAULT_ENV'])
-    pc = True
-    # pc = False
+    # pc = True
+    pc = False
 
 
     with nvtx.annotate("Test case 1"):
@@ -54,6 +63,6 @@ if __name__ == '__main__':
             test_reg("OneVsAll", batch_size=320000, pc=pc)
         else:
             test_reg("OneVsAll", batch_size=8000, pc=pc)
-        # test_reg("Single", batch_size=32000)
+            # test_reg("Single", batch_size=8000, pc=pc)
 
     print("Finish tests")
