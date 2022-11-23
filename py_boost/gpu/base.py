@@ -153,6 +153,7 @@ class Ensemble:
         cpu_pred = [pinned_array(np.empty((batch_size, n_out), dtype=cur_dtype)) for _ in range(n_streams)]
         gpu_pred = [cp.empty((batch_size, n_out), dtype=cur_dtype) for _ in range(n_streams)]
 
+        print(f"Init batch: {X[0:batch_size].shape}")
         cpu_batch = [pinned_array(np.empty(X[0:batch_size].shape, dtype=cur_dtype)) for _ in range(n_streams)]
         gpu_batch = [cp.empty(X[0:batch_size].shape, dtype=cur_dtype) for _ in range(n_streams)]
 
@@ -179,6 +180,7 @@ class Ensemble:
                         gpu_pred[nst][:] = self.base_score
 
                     with nvtx.annotate(f"calc_trees"):
+                        print(f"Batch size: {real_batch_len}")
                         for n, tree in enumerate(self.models):
                             tree.predict_from_new_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
