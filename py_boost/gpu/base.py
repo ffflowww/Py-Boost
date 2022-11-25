@@ -101,6 +101,8 @@ class Ensemble:
         # new tree format
         # if left/right node is negative it means that it shows index in values array
 
+        print("???")
+
         n_gr = self.models[0].ngroups
         for n, tree in enumerate(self.models):
             gr_subtree_offsets = np.zeros(n_gr, dtype=np.int32)
