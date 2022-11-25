@@ -101,7 +101,7 @@ class Ensemble:
         # new tree format
         # if left/right node is negative it means that it shows index in values array
 
-        print("nf")
+        # print("nf")
 
         n_gr = self.models[0].ngroups
         for n, tree in enumerate(self.models):
