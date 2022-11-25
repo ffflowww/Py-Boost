@@ -146,7 +146,7 @@ class Ensemble:
 
                 q = [(0, 0)]
                 while len(q) != 0:  # BFS
-                    n_old, n_new = q[-1]
+                    n_old, n_new = q[0]
                     if tree.nans[i][n_old] is False:
                         nf[4 * (gr_subtree_offsets[i] + n_new)] = float(tree.feats[i][n_old] + 1)
                     else:
