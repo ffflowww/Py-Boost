@@ -167,7 +167,7 @@ class Ensemble:
                     else:
                         new_node_number = q[-1][1] + 1
                         nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(new_node_number)
-                        q.append((ln, new_node_number))
+                        q.append((rn, new_node_number))
                     q.pop(0)
 
             tree.new_format = cp.array(nf, dtype=cp.float32)
