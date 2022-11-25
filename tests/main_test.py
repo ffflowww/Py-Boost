@@ -53,6 +53,7 @@ def test_reg(target_splitter, batch_size, pc=False):
     for i, line in enumerate(diff):
         if line[0] > 0:
             np.savetxt("out.txt", diff[i-10: i+10000])
+            exit()
 
 
 if __name__ == '__main__':
