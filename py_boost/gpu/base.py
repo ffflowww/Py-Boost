@@ -103,13 +103,16 @@ class Ensemble:
 
         n_gr = self.models[0].ngroups
         for n, tree in enumerate(self.models):
-            nf = np.zeros(n_gr * 63 * 4, dtype=np.float32)
             gr_subtree_offsets = np.zeros(n_gr, dtype=np.int32)
+            total_size = 0
+            for i in range(n_gr):
+                total_size += (tree.feats[i] >= 0).sum()
+                if i < n_gr - 1:
+                    gr_subtree_offsets[i + 1] = total_size
+            nf = np.zeros(total_size * 4, dtype=np.float32)
+
             for i in range(n_gr):
                 gr_subtree_size = (tree.feats[i] >= 0).sum()
-                if i < n_gr - 1:
-                    gr_subtree_offsets[i + 1] = gr_subtree_offsets[i] + gr_subtree_size
-
                 for j in range(gr_subtree_size):
                     if tree.nans[i][j] is False:
                         nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j] + 1)
