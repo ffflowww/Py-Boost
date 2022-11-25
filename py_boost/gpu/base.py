@@ -118,23 +118,25 @@ class Ensemble:
                 if gr_subtree_size != 63:
                     print(n, i, gr_subtree_size, gr_subtree_offsets)
                     print(tree.feats)
-                    exit()
+                j_ = 0
                 for j in range(gr_subtree_size):
+                    while tree.feats[i][j_] == -1:
+                        j_ += 1
                     if tree.nans[i][j] is False:
-                        nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j] + 1)
+                        nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j_] + 1)
                     else:
-                        nf[4 * (gr_subtree_offsets[i] + j)] = float(-(tree.feats[i][j] + 1))
-                    nf[4 * (gr_subtree_offsets[i] + j) + 1] = tree.val_splits[i][j]
-                    nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(tree.split[i][j][0])
-                    nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(tree.split[i][j][1])
-                    ln = tree.split[i][j][0]
-                    rn = tree.split[i][j][1]
+                        nf[4 * (gr_subtree_offsets[i] + j)] = float(-(tree.feats[i][j_] + 1))
+                    nf[4 * (gr_subtree_offsets[i] + j) + 1] = tree.val_splits[i][j_]
+                    nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(tree.split[i][j_][0])
+                    nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(tree.split[i][j_][1])
+                    ln = tree.split[i][j_][0]
+                    rn = tree.split[i][j_][1]
 
                     if tree.feats[i][ln] < 0:
                         nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(-(tree.leaves[ln][i] + 1))
                     if tree.feats[i][rn] < 0:
                         nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(-(tree.leaves[rn][i] + 1))
-
+                    j_ += 1
             tree.new_format = cp.array(nf, dtype=cp.float32)
             tree.new_format_offsets = cp.array(gr_subtree_offsets, dtype=cp.int32)
 

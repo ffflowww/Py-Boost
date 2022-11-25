@@ -624,10 +624,10 @@ new_tree_prediction_kernel = cp.RawKernel(
         int i_out = gr_out_sizes[j_];
         int i_out_end = gr_out_sizes[j_ + 1];
         int value_offset = (-n_node - 1) * n_out;
-        //while(i_out < i_out_end) {
-        //    res[i_out_offset + gr_out_indexes[i_out]] += values[value_offset + gr_out_indexes[i_out]];
-        //    ++i_out;
-        //}
+        while(i_out < i_out_end) {
+            res[i_out_offset + gr_out_indexes[i_out]] += values[value_offset + gr_out_indexes[i_out]];
+            ++i_out;
+        }
     }
     ''',
     'new_tree_prediction_kernel')
