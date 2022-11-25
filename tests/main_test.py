@@ -49,6 +49,9 @@ def test_reg(target_splitter, batch_size, pc=False):
 
     diff = yy - yy2
     print(f"Outs diff: {diff.sum()}")
+    print(diff[:10])
+    print("#@@#")
+    print(diff[-10:])
 
 
 if __name__ == '__main__':
