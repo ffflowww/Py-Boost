@@ -185,7 +185,7 @@ class Tree:
             nr = 512 // ngroups
             if nrows > nr:
                 while nrows % nr > 0:
-                    nr -= 1
+                    nr = nr // 2
                 return (nrows // nr,), (ngroups, nr)
             else:
                 return (nrows,), (ngroups, 1)  # not optimal for sure
