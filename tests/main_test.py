@@ -49,7 +49,10 @@ def test_reg(target_splitter, batch_size, pc=False):
 
     diff = yy - yy2
     print(f"Outs diff: {diff.sum()}")
-    np.savetxt("out.txt", diff)
+
+    for i, line in enumerate(diff):
+        if line[0] > 0:
+            np.savetxt("out.txt", diff[i-10: i+10000])
 
 
 if __name__ == '__main__':
