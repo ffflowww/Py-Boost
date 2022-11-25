@@ -607,7 +607,8 @@ new_tree_prediction_kernel = cp.RawKernel(
         float4 nd;
         float x;
         int n_feat_raw;
-
+        
+        // going through the tree
         while (n_node >= 0) {
             nd = tree[tree_offset + n_node];
 
@@ -620,6 +621,8 @@ new_tree_prediction_kernel = cp.RawKernel(
                 n_node = (x > nd.y) ? (int)nd.w : (int)nd.z;
             }
         }
+        
+        // writing result
         long long i_out_offset = i_ * n_out;
         int i_out = gr_out_sizes[j_];
         int i_out_end = gr_out_sizes[j_ + 1];

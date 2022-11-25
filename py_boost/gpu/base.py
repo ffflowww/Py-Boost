@@ -99,13 +99,15 @@ class Ensemble:
 
     def create_new_format(self):
         # new tree format
-        # if left/right node is negative it means that it shows index in values array
-
-        # print("nf")
-
-        n_gr = self.models[0].ngroups
+        # the sign of the feat value shows the behaviour in case of nan
+        # to the value written in feats an extra "1" is added to deal with zero
+        # if left/right node is negative, it means that it shows index in values array (abs)
+        # in case of negative value an extra "1" is added to deal with zero
         for n, tree in enumerate(self.models):
+            n_gr = tree.ngroups
             gr_subtree_offsets = np.zeros(n_gr, dtype=np.int32)
+
+            # memory allocation for new tree array
             total_size = 0
             for i in range(n_gr):
                 total_size += (tree.feats[i] >= 0).sum()
@@ -113,37 +115,8 @@ class Ensemble:
                     gr_subtree_offsets[i + 1] = total_size
             nf = np.zeros(total_size * 4, dtype=np.float32)
 
+            # reformatting the tree
             for i in range(n_gr):
-                # gr_subtree_size = (tree.feats[i] >= 0).sum()
-                # if gr_subtree_size != 63:
-                #     print(n, i, gr_subtree_size, gr_subtree_offsets)
-                #     print(tree.feats.shape)
-                #     print(tree.feats)
-                #     print(tree.leaves.shape)
-                #     print(tree.leaves)
-                #     print(tree.values.shape)
-                #     print(tree.values)
-                #     exit()
-                # extra_offset = 0
-                # for j in range(gr_subtree_size):
-                #     while tree.feats[i][j + extra_offset] == -1:
-                #         extra_offset += 1
-                #
-                #     if tree.nans[i][j + extra_offset] is False:
-                #         nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j + extra_offset] + 1)
-                #     else:
-                #         nf[4 * (gr_subtree_offsets[i] + j)] = float(-(tree.feats[i][j + extra_offset] + 1))
-                #     nf[4 * (gr_subtree_offsets[i] + j) + 1] = tree.val_splits[i][j + extra_offset]
-                #     nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(tree.split[i][j + extra_offset][0])
-                #     nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(tree.split[i][j + extra_offset][1])
-                #     ln = tree.split[i][j + extra_offset][0]
-                #     rn = tree.split[i][j + extra_offset][1]
-                #
-                #     if tree.feats[i][ln] < 0:
-                #         nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(-(tree.leaves[ln][i] + 1))
-                #     if tree.feats[i][rn] < 0:
-                #         nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(-(tree.leaves[rn][i] + 1))
-
                 q = [(0, 0)]
                 while len(q) != 0:  # BFS
                     n_old, n_new = q[0]
@@ -173,6 +146,7 @@ class Ensemble:
             tree.new_format = cp.array(nf, dtype=cp.float32)
             tree.new_format_offsets = cp.array(gr_subtree_offsets, dtype=cp.int32)
 
+            # new arrays for output indexing
             ns = [0]
             ni = []
             gri = np.array(tree.group_index, dtype=np.int32)

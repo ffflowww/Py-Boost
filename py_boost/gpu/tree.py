@@ -192,7 +192,7 @@ class Tree:
 
         blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
 
-        # print(blocks, threads, X.shape, self.ngroups)
+        print(blocks, threads, X.shape, self.ngroups)
 
         new_tree_prediction_kernel(blocks, threads, ((X,
                                                       self.new_format,
