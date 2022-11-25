@@ -597,10 +597,10 @@ new_tree_prediction_kernel = cp.RawKernel(
         const int n_out,
         float* res)
     {
-        int i_ = blockIdx.x * blockDim.y + threadIdx.y;
+        long long i_ = blockIdx.x * blockDim.y + threadIdx.y;
         int j_ = threadIdx.x;
 
-        int x_feat_offset = n_features * i_;
+        long long x_feat_offset = n_features * i_;
         int tree_offset = gr_subtree_offsets[j_];
 
         int n_node = 0;
@@ -620,13 +620,12 @@ new_tree_prediction_kernel = cp.RawKernel(
                 n_node = (x > nd.y) ? (int)nd.w : (int)nd.z;
             }
         }
-        int i_out_offset = i_ * n_out;
+        long long i_out_offset = i_ * n_out;
         int i_out = gr_out_sizes[j_];
         int i_out_end = gr_out_sizes[j_ + 1];
         int value_offset = (-n_node - 1) * n_out;
-        while(i_out < i_out_end) {
+        for(; i_out < i_out_end; ++i_out) {
             res[i_out_offset + gr_out_indexes[i_out]] += values[value_offset + gr_out_indexes[i_out]];
-            ++i_out;
         }
     }
     ''',
