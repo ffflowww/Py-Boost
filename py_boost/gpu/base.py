@@ -101,7 +101,7 @@ class Ensemble:
         # new tree format
         # if left/right node is negative it means that it shows index in values array
 
-        print("???")
+        print("nf")
 
         n_gr = self.models[0].ngroups
         for n, tree in enumerate(self.models):
@@ -115,7 +115,8 @@ class Ensemble:
 
             for i in range(n_gr):
                 gr_subtree_size = (tree.feats[i] >= 0).sum()
-                print(i, gr_subtree_size)
+                if gr_subtree_size != 63:
+                    print(n, i, gr_subtree_size)
                 for j in range(gr_subtree_size):
                     if tree.nans[i][j] is False:
                         nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j] + 1)
