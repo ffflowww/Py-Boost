@@ -202,6 +202,8 @@ class Ensemble:
         gpu_batch = [cp.empty(X[0:batch_size].shape, dtype=cur_dtype) for _ in range(n_streams)]
 
         n_half_trees = len(self.models) // 2
+        cpu_batch_free_event = [None, None]
+        cpu_out_ready_event = [None, None]
         last_batch_size = 0
         last_n_stream = 0
         for k, i in enumerate(range(0, X.shape[0], batch_size)):
@@ -210,17 +212,14 @@ class Ensemble:
                 with nvtx.annotate(f"pred: {k}"):
                     real_batch_len = batch_size if i + batch_size <= X.shape[0] else X.shape[0] - i
 
-                    with nvtx.annotate(f"copying"):
-                        if k >= 2:
-                            stream.synchronize()
-                            cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
-
                     with nvtx.annotate(f"to_cpu"):
+                        if k >= 2:
+                            stream.wait_event(cpu_batch_free_event[nst])
                         cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
 
                     with nvtx.annotate(f"to_gpu"):
                         gpu_batch[nst][:real_batch_len].set(cpu_batch[nst][:real_batch_len])
-                        # gpu_transfer_data_event = stream.record()
+                        cpu_batch_free_event[nst] = stream.record()
 
                     with nvtx.annotate(f"base_score"):
                         gpu_pred[nst][:] = self.base_score
@@ -232,9 +231,14 @@ class Ensemble:
                                 pass
                             tree.predict_from_new_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
+                    with nvtx.annotate(f"copying"):
+                        if k >= 2:
+                            stream.wait_event(cpu_out_ready_event[nst])
+                            cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
+
                     with nvtx.annotate(f"post_proc"):
                         self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
-                        # cpu_out_ready_event = stream.record()
+                        cpu_out_ready_event[nst] = stream.record()
 
                     last_batch_size = real_batch_len
                     last_n_stream = nst
