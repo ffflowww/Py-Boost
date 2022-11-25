@@ -31,7 +31,7 @@ def test_reg(target_splitter, batch_size, pc=False):
     with nvtx.annotate("reformatting"):
         model.create_new_format()
 
-    exit()
+    # exit()
 
     print("Testing orig prob...")
     with nvtx.annotate("pred orig prob"):
