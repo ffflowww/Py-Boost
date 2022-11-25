@@ -114,65 +114,60 @@ class Ensemble:
             nf = np.zeros(total_size * 4, dtype=np.float32)
 
             for i in range(n_gr):
-                gr_subtree_size = (tree.feats[i] >= 0).sum()
-                if gr_subtree_size != 63:
-                    print(n, i, gr_subtree_size, gr_subtree_offsets)
-                    print(tree.feats.shape)
-                    print(tree.feats)
-                    print(tree.leaves.shape)
-                    print(tree.leaves)
-                    print(tree.values.shape)
-                    print(tree.values)
-                    exit()
-                extra_offset = 0
-                for j in range(gr_subtree_size):
-                    while tree.feats[i][j + extra_offset] == -1:
-                        extra_offset += 1
-
-                    if tree.nans[i][j + extra_offset] is False:
-                        nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j + extra_offset] + 1)
-                    else:
-                        nf[4 * (gr_subtree_offsets[i] + j)] = float(-(tree.feats[i][j + extra_offset] + 1))
-                    nf[4 * (gr_subtree_offsets[i] + j) + 1] = tree.val_splits[i][j + extra_offset]
-                    nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(tree.split[i][j + extra_offset][0])
-                    nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(tree.split[i][j + extra_offset][1])
-                    ln = tree.split[i][j + extra_offset][0]
-                    rn = tree.split[i][j + extra_offset][1]
-
-                    if tree.feats[i][ln] < 0:
-                        nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(-(tree.leaves[ln][i] + 1))
-                    if tree.feats[i][rn] < 0:
-                        nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(-(tree.leaves[rn][i] + 1))
-
-
-
-                # q = [0]
-                # j = 0
-                # while len(q) != 0:  # BFS
-                #     n_node = q.pop(0)
-                #     if tree.nans[i][n_node] is False:
-                #         nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][n_node] + 1)
+                # gr_subtree_size = (tree.feats[i] >= 0).sum()
+                # if gr_subtree_size != 63:
+                #     print(n, i, gr_subtree_size, gr_subtree_offsets)
+                #     print(tree.feats.shape)
+                #     print(tree.feats)
+                #     print(tree.leaves.shape)
+                #     print(tree.leaves)
+                #     print(tree.values.shape)
+                #     print(tree.values)
+                #     exit()
+                # extra_offset = 0
+                # for j in range(gr_subtree_size):
+                #     while tree.feats[i][j + extra_offset] == -1:
+                #         extra_offset += 1
+                #
+                #     if tree.nans[i][j + extra_offset] is False:
+                #         nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j + extra_offset] + 1)
                 #     else:
-                #         nf[4 * (gr_subtree_offsets[i] + j)] = float(-(tree.feats[i][n_node] + 1))
-                #     nf[4 * (gr_subtree_offsets[i] + j) + 1] = float(tree.val_splits[i][n_node])
-                #     ln = tree.split[i][n_node][0]
-                #     rn = tree.split[i][n_node][1]
+                #         nf[4 * (gr_subtree_offsets[i] + j)] = float(-(tree.feats[i][j + extra_offset] + 1))
+                #     nf[4 * (gr_subtree_offsets[i] + j) + 1] = tree.val_splits[i][j + extra_offset]
+                #     nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(tree.split[i][j + extra_offset][0])
+                #     nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(tree.split[i][j + extra_offset][1])
+                #     ln = tree.split[i][j + extra_offset][0]
+                #     rn = tree.split[i][j + extra_offset][1]
                 #
                 #     if tree.feats[i][ln] < 0:
                 #         nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(-(tree.leaves[ln][i] + 1))
-                #     else:
-                #         nf[4 * (gr_subtree_offsets[i] + j) + 2] = float(tree.split[i][n_node][0])
-                #
                 #     if tree.feats[i][rn] < 0:
                 #         nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(-(tree.leaves[rn][i] + 1))
-                #     else:
-                #         nf[4 * (gr_subtree_offsets[i] + j) + 3] = float(tree.split[i][n_node][1])
-                #
-                #     j += 1
-                #     if ln :
-                #         q.append(ln)
-                #     if rn:
-                #         q.append(rn)
+
+                q = [(0, 0)]
+                while len(q) != 0:  # BFS
+                    n_old, n_new = q.pop(0)
+                    if tree.nans[i][n_old] is False:
+                        nf[4 * (gr_subtree_offsets[i] + n_new)] = float(tree.feats[i][n_old] + 1)
+                    else:
+                        nf[4 * (gr_subtree_offsets[i] + n_new)] = float(-(tree.feats[i][n_old] + 1))
+                    nf[4 * (gr_subtree_offsets[i] + n_new) + 1] = float(tree.val_splits[i][n_old])
+                    ln = tree.split[i][n_old][0]
+                    rn = tree.split[i][n_old][1]
+
+                    if tree.feats[i][ln] < 0:
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(-(tree.leaves[ln][i] + 1))
+                    else:
+                        new_node_number = q[-1][1] + 1
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(new_node_number)
+                        q.append((ln, new_node_number))
+
+                    if tree.feats[i][rn] < 0:
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(-(tree.leaves[rn][i] + 1))
+                    else:
+                        new_node_number = q[-1][1] + 1
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(new_node_number)
+                        q.append((ln, new_node_number))
 
             tree.new_format = cp.array(nf, dtype=cp.float32)
             tree.new_format_offsets = cp.array(gr_subtree_offsets, dtype=cp.int32)
