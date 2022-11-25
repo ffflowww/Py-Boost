@@ -214,7 +214,7 @@ class Ensemble:
 
                     with nvtx.annotate(f"to_cpu"):
                         if k >= 2:
-                            stream.wait_event(cpu_batch_free_event[nst])
+                            cpu_batch_free_event[nst].synchronize()
                         cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
 
                     with nvtx.annotate(f"to_gpu"):
@@ -233,7 +233,7 @@ class Ensemble:
 
                     with nvtx.annotate(f"copying"):
                         if k >= 2:
-                            stream.wait_event(cpu_out_ready_event[nst])
+                            cpu_out_ready_event[nst].synchronize()
                             cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
 
                     with nvtx.annotate(f"post_proc"):
