@@ -60,7 +60,8 @@ if __name__ == '__main__':
 
     with nvtx.annotate("Test case 1"):
         if pc:
-            test_reg("OneVsAll", batch_size=300000, pc=pc)
+            # test_reg("OneVsAll", batch_size=300000, pc=pc)
+            test_reg("Single", batch_size=300000, pc=pc)
         else:
             test_reg("OneVsAll", batch_size=3333, pc=pc)
             # test_reg("Single", batch_size=8000, pc=pc)
