@@ -122,7 +122,7 @@ class Ensemble:
                 for j in range(gr_subtree_size):
                     while tree.feats[i][j_] == -1:
                         j_ += 1
-                    if tree.nans[i][j] is False:
+                    if tree.nans[i][j_] is False:
                         nf[4 * (gr_subtree_offsets[i] + j)] = float(tree.feats[i][j_] + 1)
                     else:
                         nf[4 * (gr_subtree_offsets[i] + j)] = float(-(tree.feats[i][j_] + 1))
