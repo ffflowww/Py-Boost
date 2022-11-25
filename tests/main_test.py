@@ -14,7 +14,7 @@ import pickle
 def test_reg(target_splitter, batch_size, pc=False):
     X, y = make_regression(2000000, 100, n_targets=32, random_state=42)
     if pc:
-        X_test, y_test = X[:1950000], y[:1950000]
+        X_test, y_test = X[:950000], y[:950000]
         trees = 100
         X, y = X[-50000:], y[-50000:]
     else:
@@ -49,9 +49,7 @@ def test_reg(target_splitter, batch_size, pc=False):
 
     diff = yy - yy2
     print(f"Outs diff: {diff.sum()}")
-    print(diff[:10])
-    print("#@@#")
-    print(diff[-10:])
+    np.savetxt("out.txt", diff)
 
 
 if __name__ == '__main__':
