@@ -221,6 +221,10 @@ class Ensemble:
                             #     pass
                             tree.predict_from_new_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
+
+                            map_streams[nst].synchronize()
+                            map_streams[1 - nst].synchronize()
+
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
 
