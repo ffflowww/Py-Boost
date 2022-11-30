@@ -15,7 +15,7 @@ def test_reg(target_splitter, batch_size, pc=False):
     X, y = make_regression(2000000, 100, n_targets=32, random_state=42)
     if pc:
         X_test, y_test = X[:1950000], y[:1950000]
-        trees = 200
+        trees = 100
         X, y = X[-50000:], y[-50000:]
     else:
         X_test, y_test = X[:192000], y[:192000]
@@ -79,8 +79,8 @@ if __name__ == '__main__':
 
     with nvtx.annotate("Test case 1"):
         if pc:
-            # test_reg("OneVsAll", batch_size=300000, pc=pc)
-            test_reg("Single", batch_size=260000, pc=pc)
+            test_reg("OneVsAll", batch_size=300000, pc=pc)
+            # test_reg("Single", batch_size=300000, pc=pc)
         else:
             test_reg("OneVsAll", batch_size=3333, pc=pc)
             # test_reg("Single", batch_size=8000, pc=pc)
