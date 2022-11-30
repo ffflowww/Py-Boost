@@ -224,9 +224,9 @@ class Ensemble:
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
 
-                    with nvtx.annotate(f"copying"):
-                        if k >= 2:
-                            cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
+                    # with nvtx.annotate(f"copying"):
+                    #     if k >= 2:
+                    #         cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
 
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
@@ -235,25 +235,30 @@ class Ensemble:
                         self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
                         cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
 
+                        map_streams[nst].synchronize()
+                        map_streams[1 - nst].synchronize()
+
+                        cpu_pred_full[i:i + real_batch_len] = cpu_pred[nst][:real_batch_len]
+
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
 
                     last_batch_size = real_batch_len
                     last_n_stream = nst
 
-        if int(np.floor(X.shape[0] / batch_size)) == 0:
-            with nvtx.annotate(f"copying last1"):
-                with map_streams[last_n_stream] as stream:
-                    stream.synchronize()
-                    cpu_pred_full[:last_batch_size] = cpu_pred[last_n_stream][:last_batch_size]
-        else:
-            with nvtx.annotate(f"copying last2"):
-                with map_streams[1 - last_n_stream] as stream:
-                    stream.synchronize()  # prev stream
-                    cpu_pred_full[X.shape[0] - batch_size - last_batch_size: X.shape[0] - last_batch_size] = cpu_pred[1 - last_n_stream][:batch_size]
-                with map_streams[last_n_stream] as stream:
-                    stream.synchronize()  # current stream
-                    cpu_pred_full[X.shape[0] - last_batch_size:] = cpu_pred[last_n_stream][:last_batch_size]
+        # if int(np.floor(X.shape[0] / batch_size)) == 0:
+        #     with nvtx.annotate(f"copying last1"):
+        #         with map_streams[last_n_stream] as stream:
+        #             stream.synchronize()
+        #             cpu_pred_full[:last_batch_size] = cpu_pred[last_n_stream][:last_batch_size]
+        # else:
+        #     with nvtx.annotate(f"copying last2"):
+        #         with map_streams[1 - last_n_stream] as stream:
+        #             stream.synchronize()  # prev stream
+        #             cpu_pred_full[X.shape[0] - batch_size - last_batch_size: X.shape[0] - last_batch_size] = cpu_pred[1 - last_n_stream][:batch_size]
+        #         with map_streams[last_n_stream] as stream:
+        #             stream.synchronize()  # current stream
+        #             cpu_pred_full[X.shape[0] - last_batch_size:] = cpu_pred[last_n_stream][:last_batch_size]
 
         # cp.cuda.get_current_stream().synchronize()
         return cpu_pred_full
