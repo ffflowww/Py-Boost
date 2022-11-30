@@ -54,7 +54,7 @@ def test_reg(target_splitter, batch_size, pc=False):
     trouble_lines = []
     ok_lines = []
     for i, line in enumerate(diff):
-        if line[0] > 0:
+        if line[0] != 0:
             if not saved:
                 np.savetxt("out.txt", diff[i-10: i+10000])
                 saved = True
