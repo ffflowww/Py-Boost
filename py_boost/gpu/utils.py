@@ -583,10 +583,10 @@ node_index_kernel = cp.ElementwiseKernel(
 
     'node_index_kernel')
 
-new_tree_prediction_kernel = cp.RawKernel(
+tree_prediction_kernel = cp.RawKernel(
     r'''
     extern "C" __global__
-    void new_tree_prediction_kernel(
+    void tree_prediction_kernel(
         const float* X,
         const float4* tree,
         const int* gr_subtree_offsets,
@@ -632,7 +632,7 @@ new_tree_prediction_kernel = cp.RawKernel(
         }
     }
     ''',
-    'new_tree_prediction_kernel')
+    'tree_prediction_kernel')
 
 
 def get_tree_node(arr, feats, val_splits, split, nan_left):
