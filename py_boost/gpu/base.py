@@ -209,9 +209,6 @@ class Ensemble:
                         for n, tree in enumerate(self.models):
                             tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
-                    map_streams[nst].synchronize()
-                    map_streams[1 - nst].synchronize()
-
                     with nvtx.annotate(f"copying"):
                         if k >= 2:
                             cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
