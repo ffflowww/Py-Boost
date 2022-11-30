@@ -175,7 +175,7 @@ class Ensemble:
         cpu_batch = [pinned_array(np.empty(X[0:batch_size].shape, dtype=cur_dtype)) for _ in range(n_streams)]
         gpu_batch = [cp.empty(X[0:batch_size].shape, dtype=cur_dtype) for _ in range(n_streams)]
 
-        n_half_trees = len(self.models) // 2
+        # n_half_trees = len(self.models) // 2
         cpu_batch_free_event = [None, None]
         cpu_out_ready_event = [None, None]
         last_batch_size = 0
@@ -201,8 +201,8 @@ class Ensemble:
                     with nvtx.annotate(f"calc_trees"):
                         print(f"Batch size: {real_batch_len}")
                         for n, tree in enumerate(self.models):
-                            if n == n_half_trees:
-                                pass
+                            # if n == n_half_trees:
+                            #     pass
                             tree.predict_from_new_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                     with nvtx.annotate(f"copying"):
