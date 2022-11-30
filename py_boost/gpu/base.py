@@ -191,7 +191,8 @@ class Ensemble:
                     with nvtx.annotate(f"to_cpu"):
                         if k >= 2:
                             cpu_batch_free_event[nst].synchronize()
-                        cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
+                        # cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
+                        cpu_batch[nst] = pinned_array(X[i:i + real_batch_len].astype(cur_dtype))
 
                     with nvtx.annotate(f"to_gpu"):
                         if k >= 2:
