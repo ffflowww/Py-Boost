@@ -29,6 +29,8 @@ class Ensemble:
         self.max_bin = 256
         self.min_data_in_bin = 3
 
+        self._new_format_created = False
+
     def to_device(self):
         """Move trained ensemble data to current GPU device
 
@@ -257,3 +259,131 @@ class Ensemble:
             np.add.at(importance, tree.feats[sl], acc_val)
 
         return importance
+
+    def create_new_format(self):
+        # new tree format
+        # the sign of the feat value shows the behaviour in case of nan
+        # to the value written in feats an extra "1" is added to deal with zero
+        # if left/right node is negative, it means that it shows index in values array (abs)
+        # in case of negative value an extra "1" is added to deal with zero
+        for n, tree in enumerate(self.models):
+            n_gr = tree.ngroups
+            gr_subtree_offsets = np.zeros(n_gr, dtype=np.int32)
+
+            # memory allocation for new tree array
+            total_size = 0
+            for i in range(n_gr):
+                total_size += (tree.feats[i] >= 0).sum()
+                if i < n_gr - 1:
+                    gr_subtree_offsets[i + 1] = total_size
+            nf = np.zeros(total_size * 4, dtype=np.float32)
+
+            # reformatting the tree
+            for i in range(n_gr):
+                q = [(0, 0)]
+                while len(q) != 0:  # BFS
+                    n_old, n_new = q[0]
+                    if tree.nans[i][n_old] is False:
+                        nf[4 * (gr_subtree_offsets[i] + n_new)] = float(tree.feats[i][n_old] + 1)
+                    else:
+                        nf[4 * (gr_subtree_offsets[i] + n_new)] = float(-(tree.feats[i][n_old] + 1))
+                    nf[4 * (gr_subtree_offsets[i] + n_new) + 1] = float(tree.val_splits[i][n_old])
+                    ln = tree.split[i][n_old][0]
+                    rn = tree.split[i][n_old][1]
+
+                    if tree.feats[i][ln] < 0:
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(-(tree.leaves[ln][i] + 1))
+                    else:
+                        new_node_number = q[-1][1] + 1
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(new_node_number)
+                        q.append((ln, new_node_number))
+
+                    if tree.feats[i][rn] < 0:
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(-(tree.leaves[rn][i] + 1))
+                    else:
+                        new_node_number = q[-1][1] + 1
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(new_node_number)
+                        q.append((rn, new_node_number))
+                    q.pop(0)
+
+            tree.new_format = cp.array(nf, dtype=cp.float32)
+            tree.new_format_offsets = cp.array(gr_subtree_offsets, dtype=cp.int32)
+
+            # new arrays for output indexing
+            ns = [0]
+            ni = []
+            gri = np.array(tree.group_index, dtype=np.int32)
+            for gr_ind in range(tree.ngroups):
+                ns.append((gri == gr_ind).sum() + ns[-1])
+                for en, ind in enumerate(tree.group_index):
+                    if ind == gr_ind:
+                        ni.append(en)
+            tree.new_out_sizes = cp.array(ns, dtype=cp.int32)
+            tree.new_out_indexes = cp.array(ni, dtype=cp.int32)
+        self._new_format_created = True
+
+    def predict_new(self, X, batch_size=100000):
+        self.to_device()
+        if not self._new_format_created:
+            self.create_new_format()
+
+        cur_dtype = np.float32
+        n_streams = 2  # don't change
+        map_streams = [cp.cuda.Stream() for _ in range(n_streams)]
+
+        # result allocation
+        n_out = self.base_score.shape[0]
+        cpu_pred_full = np.empty((X.shape[0], n_out), dtype=cur_dtype)
+        cpu_pred = [pinned_array(np.empty((batch_size, n_out), dtype=cur_dtype)) for _ in range(n_streams)]
+        gpu_pred = [cp.empty((batch_size, n_out), dtype=cur_dtype) for _ in range(n_streams)]
+
+        # batch allocation
+        cpu_batch = [pinned_array(np.empty(X[0:batch_size].shape, dtype=cur_dtype)) for _ in range(n_streams)]
+        gpu_batch = [cp.empty(X[0:batch_size].shape, dtype=cur_dtype) for _ in range(n_streams)]
+
+        cpu_batch_free_event = [None, None]
+        cpu_out_ready_event = [None, None]
+        last_batch_size = 0
+        last_n_stream = 0
+        for k, i in enumerate(range(0, X.shape[0], batch_size)):
+            nst = k % n_streams
+            with map_streams[nst] as stream:
+                real_batch_len = batch_size if i + batch_size <= X.shape[0] else X.shape[0] - i
+
+                if k >= 2:
+                    cpu_batch_free_event[nst].synchronize()
+                cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
+
+                if k >= 2:
+                    cpu_out_ready_event[nst].synchronize()
+                gpu_batch[nst][:real_batch_len].set(cpu_batch[nst][:real_batch_len])
+                cpu_batch_free_event[nst] = stream.record(cp.cuda.Event(block=True))
+
+                gpu_pred[nst][:] = self.base_score
+
+                for n, tree in enumerate(self.models):
+                    tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+
+                if k >= 2:
+                    cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
+
+                self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
+                cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
+
+                last_batch_size = real_batch_len
+                last_n_stream = nst
+
+        if int(np.floor(X.shape[0] / batch_size)) == 0:  # only one stream was used
+            with map_streams[last_n_stream] as stream:
+                stream.synchronize()
+                cpu_pred_full[:last_batch_size] = cpu_pred[last_n_stream][:last_batch_size]
+        else:
+            with map_streams[1 - last_n_stream] as stream:
+                stream.synchronize()
+                cpu_pred_full[X.shape[0] - batch_size - last_batch_size: X.shape[0] - last_batch_size] = \
+                    cpu_pred[1 - last_n_stream][:batch_size]
+            with map_streams[last_n_stream] as stream:
+                stream.synchronize()
+                cpu_pred_full[X.shape[0] - last_batch_size:] = cpu_pred[last_n_stream][:last_batch_size]
+
+        return cpu_pred_full

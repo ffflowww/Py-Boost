@@ -583,6 +583,56 @@ node_index_kernel = cp.ElementwiseKernel(
 
     'node_index_kernel')
 
+tree_prediction_kernel = cp.RawKernel(
+    r'''
+    extern "C" __global__
+    void tree_prediction_kernel(
+        const float* X,
+        const float4* tree,
+        const int* gr_subtree_offsets,
+        const float* values,
+        const int* gr_out_sizes,
+        const int* gr_out_indexes,
+        const int n_features,
+        const int n_out,
+        float* res)
+    {
+        long long i_ = blockIdx.x * blockDim.y + threadIdx.y;
+        int j_ = threadIdx.x;
+
+        long long x_feat_offset = n_features * i_;
+        int tree_offset = gr_subtree_offsets[j_];
+
+        int n_node = 0;
+        float4 nd;
+        float x;
+        int n_feat_raw;
+
+        // going through the tree
+        while (n_node >= 0) {
+            nd = tree[tree_offset + n_node];
+
+            n_feat_raw = (int)nd.x;
+            x = X[x_feat_offset + abs(n_feat_raw) - 1];
+
+            if (isnan(x)) {
+                n_node = (n_feat_raw > 0) ? (int)nd.w : (int)nd.z;
+            } else {
+                n_node = (x > nd.y) ? (int)nd.w : (int)nd.z;
+            }
+        }
+
+        // writing result
+        long long i_out_offset = i_ * n_out;
+        int i_out = gr_out_sizes[j_];
+        int i_out_end = gr_out_sizes[j_ + 1];
+        int value_offset = (-n_node - 1) * n_out;
+        for(; i_out < i_out_end; ++i_out) {
+            res[i_out_offset + gr_out_indexes[i_out]] += values[value_offset + gr_out_indexes[i_out]];
+        }
+    }
+    ''',
+    'tree_prediction_kernel')
 
 def get_tree_node(arr, feats, val_splits, split, nan_left):
     n_gr, nf = feats.shape

@@ -4,6 +4,7 @@ import cupy as cp
 import numpy as np
 
 from .utils import apply_values, depthwise_grow_tree, get_tree_node, set_leaf_values, calc_node_values
+from .utils import tree_prediction_kernel
 
 
 class Tree:
@@ -57,6 +58,11 @@ class Tree:
         self.group_index = None
         self.leaves = None
         self.max_leaves = None
+
+        self.new_format = None
+        self.new_format_offsets = None
+        self.new_out_indexes = None
+        self.new_out_sizes = None
 
     def set_nodes(self, group, unique_nodes, new_nodes_id, best_feat, best_gain, best_split, best_nan_left):
         """Write info about new nodes
@@ -192,6 +198,31 @@ class Tree:
             cp.ndarray of leaves
         """
         return self.predict_leaf_from_nodes(self.predict_node(X))
+
+    def predict_fast(self, X, res):
+        def get_optimal_cuda_params(nrows, ngroups):
+            assert ngroups <= 1024
+            if ngroups >= 512:
+                return (nrows,), (ngroups, 1)
+            nr = 512 // ngroups
+            if nrows > nr:
+                while nrows % nr > 0:
+                    nr = nr // 2
+                return (nrows // nr,), (ngroups, nr)
+            else:
+                return (nrows,), (ngroups, 1)
+
+        blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
+
+        tree_prediction_kernel(blocks, threads, ((X,
+                                                  self.new_format,
+                                                  self.new_format_offsets,
+                                                  self.values,
+                                                  self.new_out_sizes,
+                                                  self.new_out_indexes,
+                                                  X.shape[1],
+                                                  self.nout,
+                                                  res)))
 
 
 class DepthwiseTreeBuilder:
