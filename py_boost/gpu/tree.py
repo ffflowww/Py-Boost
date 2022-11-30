@@ -59,7 +59,6 @@ class Tree:
         self.leaves = None
         self.max_leaves = None
 
-        self.new_format_created = False
         self.new_format = None
         self.new_format_offsets = None
         self.new_out_indexes = None
