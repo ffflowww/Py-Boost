@@ -64,7 +64,7 @@ def test_reg(target_splitter, batch_size, pc=False):
     tl = np.array(trouble_lines, dtype=np.int32)
     ol = np.array(ok_lines, dtype=np.int32)
     np.savetxt("trouble_lines.txt", tl)
-    np.savetxt("trouble_lines.txt", ol)
+    np.savetxt("ok_lines.txt", ol)
 
 
 
