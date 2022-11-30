@@ -208,13 +208,13 @@ class Ensemble:
                     map_streams[1 - nst].synchronize()
 
                     with nvtx.annotate(f"base_score"):
-                        gpu_pred[nst][:] = self.base_score.copy()
+                        gpu_pred[nst][:] = self.base_score
 
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
 
                     with nvtx.annotate(f"calc_trees"):
-                        print(f"Batch size: {real_batch_len}")
+                        print(f"Batch size: {real_batch_len}, i: {i}")
                         for n, tree in enumerate(self.models):
                             # if n == n_half_trees:
                             #     pass
