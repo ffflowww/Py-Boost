@@ -58,8 +58,7 @@ def test_reg(target_splitter, batch_size, pc=False):
                 np.savetxt("out.txt", diff[i-10: i+10000])
                 saved = True
             trouble_lines.append(i)
-    tl = np.array(trouble_lines)
-    print("??????")
+    tl = np.array(trouble_lines, dtype=np.int32)
     np.savetxt("trouble_lines.txt", tl)
 
 
