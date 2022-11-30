@@ -202,7 +202,7 @@ class Ensemble:
                     with nvtx.annotate(f"calc_trees"):
                         print(f"Batch size: {real_batch_len}, i: {i}")
                         for n, tree in enumerate(self.models):
-                            tree.predict_from_new_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+                            tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
