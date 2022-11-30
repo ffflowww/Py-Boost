@@ -59,6 +59,7 @@ class Tree:
         self.leaves = None
         self.max_leaves = None
 
+        self.new_format_created = False
         self.new_format = None
         self.new_format_offsets = None
         self.new_out_indexes = None
@@ -188,11 +189,9 @@ class Tree:
                     nr = nr // 2
                 return (nrows // nr,), (ngroups, nr)
             else:
-                return (nrows,), (ngroups, 1)  # not optimal for sure
+                return (nrows,), (ngroups, 1)
 
         blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
-
-        blocks, threads = (X.shape[0],), (self.ngroups, 1)
 
         tree_prediction_kernel(blocks, threads, ((X,
                                                   self.new_format,

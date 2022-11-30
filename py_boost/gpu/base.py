@@ -31,6 +31,8 @@ class Ensemble:
         self.max_bin = 256
         self.min_data_in_bin = 3
 
+        self._new_format_created = False
+
     def to_device(self):
         """Move trained ensemble data to current GPU device
 
@@ -157,21 +159,24 @@ class Ensemble:
                         ni.append(en)
             tree.new_out_sizes = cp.array(ns, dtype=cp.int32)
             tree.new_out_indexes = cp.array(ni, dtype=cp.int32)
+        self._new_format_created = True
 
     def predict_new(self, X, batch_size=100000):
         self.to_device()
+        if not self._new_format_created:
+            self.create_new_format()
+
         cur_dtype = np.float32
         n_streams = 2  # don't change
         map_streams = [cp.cuda.Stream() for _ in range(n_streams)]
 
         # result allocation
         n_out = self.base_score.shape[0]
-        print(f"n_out_pred: {n_out}")
         cpu_pred_full = np.empty((X.shape[0], n_out), dtype=cur_dtype)
         cpu_pred = [pinned_array(np.empty((batch_size, n_out), dtype=cur_dtype)) for _ in range(n_streams)]
         gpu_pred = [cp.empty((batch_size, n_out), dtype=cur_dtype) for _ in range(n_streams)]
 
-        print(f"Init batch: {X[0:batch_size].shape}")
+        # batch allocation
         cpu_batch = [pinned_array(np.empty(X[0:batch_size].shape, dtype=cur_dtype)) for _ in range(n_streams)]
         gpu_batch = [cp.empty(X[0:batch_size].shape, dtype=cur_dtype) for _ in range(n_streams)]
 
@@ -215,8 +220,6 @@ class Ensemble:
                         self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
                         cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
 
-                        # cpu_pred_full[i:i + real_batch_len] = cpu_pred[nst][:real_batch_len].copy()
-
                     last_batch_size = real_batch_len
                     last_n_stream = nst
 
@@ -228,10 +231,10 @@ class Ensemble:
         else:
             with nvtx.annotate(f"copying last2"):
                 with map_streams[1 - last_n_stream] as stream:
-                    stream.synchronize()  # prev stream
+                    stream.synchronize()
                     cpu_pred_full[X.shape[0] - batch_size - last_batch_size: X.shape[0] - last_batch_size] = cpu_pred[1 - last_n_stream][:batch_size]
                 with map_streams[last_n_stream] as stream:
-                    stream.synchronize()  # current stream
+                    stream.synchronize()
                     cpu_pred_full[X.shape[0] - last_batch_size:] = cpu_pred[last_n_stream][:last_batch_size]
 
         return cpu_pred_full
