@@ -65,6 +65,7 @@ def test_reg(target_splitter, batch_size, pc=False):
     ol = np.array(ok_lines, dtype=np.int32)
     np.savetxt("trouble_lines.txt", tl)
     np.savetxt("ok_lines.txt", ol)
+    print(f"Troubles from: {tl[0]} till {tl[-1]}")
 
 
 
