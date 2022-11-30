@@ -221,10 +221,6 @@ class Ensemble:
                             #     pass
                             tree.predict_from_new_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
-
-                            map_streams[nst].synchronize()
-                            map_streams[1 - nst].synchronize()
-
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
 
@@ -236,13 +232,16 @@ class Ensemble:
                     map_streams[1 - nst].synchronize()
 
                     with nvtx.annotate(f"post_proc"):
-                        self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
+                        # self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
+
+                        gpu_pred[nst][:real_batch_len].get(out=cpu_pred_full[i:i + real_batch_len])
+
                         cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                         map_streams[nst].synchronize()
                         map_streams[1 - nst].synchronize()
 
-                        cpu_pred_full[i:i + real_batch_len][...] = cpu_pred[nst][:real_batch_len].copy()
+                        # cpu_pred_full[i:i + real_batch_len][...] = cpu_pred[nst][:real_batch_len].copy()
 
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
