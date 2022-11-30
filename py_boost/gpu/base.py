@@ -192,12 +192,12 @@ class Ensemble:
                         cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
 
                     with nvtx.annotate(f"to_gpu"):
+                        if k >= 2:
+                            cpu_out_ready_event[nst].synchronize()
                         gpu_batch[nst][:real_batch_len].set(cpu_batch[nst][:real_batch_len])
                         cpu_batch_free_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                     with nvtx.annotate(f"base_score"):
-                        if k >= 2:
-                            cpu_out_ready_event[nst].synchronize()
                         gpu_pred[nst][:] = self.base_score
 
                     with nvtx.annotate(f"calc_trees"):
