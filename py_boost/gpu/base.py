@@ -192,8 +192,7 @@ class Ensemble:
                     with nvtx.annotate(f"to_cpu"):
                         if k >= 2:
                             cpu_batch_free_event[nst].synchronize()
-                        # cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
-                        cpu_batch[nst] = pinned_array(X[i:i + real_batch_len].astype(cur_dtype))
+                        cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
 
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
@@ -209,7 +208,7 @@ class Ensemble:
                     map_streams[1 - nst].synchronize()
 
                     with nvtx.annotate(f"base_score"):
-                        gpu_pred[nst][:] = self.base_score
+                        gpu_pred[nst][:] = self.base_score.copy()
 
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
@@ -232,16 +231,13 @@ class Ensemble:
                     map_streams[1 - nst].synchronize()
 
                     with nvtx.annotate(f"post_proc"):
-                        # self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
-
-                        gpu_pred[nst][:real_batch_len].get(out=cpu_pred_full[i:i + real_batch_len])
-
+                        self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
                         cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                         map_streams[nst].synchronize()
                         map_streams[1 - nst].synchronize()
 
-                        # cpu_pred_full[i:i + real_batch_len][...] = cpu_pred[nst][:real_batch_len].copy()
+                        cpu_pred_full[i:i + real_batch_len] = cpu_pred[nst][:real_batch_len].copy()
 
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
