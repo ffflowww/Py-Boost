@@ -186,7 +186,7 @@ class Ensemble:
                 with nvtx.annotate(f"pred: {k}"):
                     real_batch_len = batch_size if i + batch_size <= X.shape[0] else X.shape[0] - i
 
-                    stream.synchronize()
+                    cp.cuda.get_current_stream().synchronize()
 
                     with nvtx.annotate(f"to_cpu"):
                         if k >= 2:
