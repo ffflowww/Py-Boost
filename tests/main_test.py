@@ -52,14 +52,19 @@ def test_reg(target_splitter, batch_size, pc=False):
 
     saved = False
     trouble_lines = []
+    ok_lines = []
     for i, line in enumerate(diff):
         if line[0] > 0:
             if not saved:
                 np.savetxt("out.txt", diff[i-10: i+10000])
                 saved = True
             trouble_lines.append(i)
+        else:
+            ok_lines.append(i)
     tl = np.array(trouble_lines, dtype=np.int32)
+    ol = np.array(ok_lines, dtype=np.int32)
     np.savetxt("trouble_lines.txt", tl)
+    np.savetxt("trouble_lines.txt", ol)
 
 
 
