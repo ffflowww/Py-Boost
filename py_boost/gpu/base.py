@@ -238,7 +238,7 @@ class Ensemble:
                         map_streams[nst].synchronize()
                         map_streams[1 - nst].synchronize()
 
-                        cpu_pred_full[i:i + real_batch_len] = cpu_pred[nst][:real_batch_len]
+                        cpu_pred_full[i:i + real_batch_len][...] = cpu_pred[nst][:real_batch_len]
 
                     map_streams[nst].synchronize()
                     map_streams[1 - nst].synchronize()
