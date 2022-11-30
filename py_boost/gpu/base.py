@@ -196,7 +196,9 @@ class Ensemble:
                         cpu_batch_free_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                     with nvtx.annotate(f"base_score"):
-                        gpu_pred[nst][:] = self.base_score
+                        if k >= 2:
+                            cpu_out_ready_event[nst].synchronize()
+                            gpu_pred[nst][:] = self.base_score
 
                     with nvtx.annotate(f"calc_trees"):
                         print(f"Batch size: {real_batch_len}")
@@ -206,9 +208,7 @@ class Ensemble:
                             tree.predict_from_new_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                     with nvtx.annotate(f"copying"):
-                        if k >= 2:
-                            cpu_out_ready_event[nst].synchronize()
-                            cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
+                        cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
 
                     with nvtx.annotate(f"post_proc"):
                         self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
