@@ -9,7 +9,7 @@ from py_boost import GradientBoosting
 
 def test_reg(target_splitter, batch_size, params):
     X, y = make_regression(params["x_size"], params["feat_size"], n_targets=params["y_size"], random_state=42)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.8, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.95, random_state=42)
     model = GradientBoosting('mse', 'r2_score',
                              ntrees=params["n_trees"], lr=.01, verbose=5, es=200, lambda_l2=1,
                              subsample=.8, colsample=.8, min_data_in_leaf=10, min_gain_to_split=0,
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     print(os.environ['CONDA_DEFAULT_ENV'])
 
     params = {
-        "x_size": 1000000,
+        "x_size": 1050000,
         "feat_size": 50,
         "y_size": 16,
         "n_trees": 500
