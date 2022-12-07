@@ -367,7 +367,7 @@ class Ensemble:
                     tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                 if k >= 2:
-                    cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
+                    cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size].copy()
 
                 self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
                 cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
