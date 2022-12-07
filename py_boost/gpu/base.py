@@ -320,6 +320,8 @@ class Ensemble:
                         ni.append(en)
             tree.new_out_sizes = cp.array(ns, dtype=cp.int32)
             tree.new_out_indexes = cp.array(ni, dtype=cp.int32)
+
+            tree.new_indexes = cp.array(tree.group_index, dtype=cp.int32)
         self._new_format_created = True
 
     def predict_new(self, X, batch_size=100000):

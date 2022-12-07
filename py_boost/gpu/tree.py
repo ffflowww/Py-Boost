@@ -63,6 +63,7 @@ class Tree:
         self.new_format_offsets = None
         self.new_out_indexes = None
         self.new_out_sizes = None
+        self.new_indexes = None
 
     def set_nodes(self, group, unique_nodes, new_nodes_id, best_feat, best_gain, best_split, best_nan_left):
         """Write info about new nodes
@@ -214,6 +215,7 @@ class Tree:
 
         blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
 
+        # pre_res = cp.array(X.shape[0] * self.ngroups, dtype=cp.int32)
         tree_prediction_kernel(blocks, threads, ((X,
                                                   self.new_format,
                                                   self.new_format_offsets,
@@ -222,6 +224,7 @@ class Tree:
                                                   self.new_out_indexes,
                                                   X.shape[1],
                                                   self.nout,
+                                                  self.new_indexes,
                                                   res)))
 
 
