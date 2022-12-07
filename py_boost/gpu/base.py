@@ -307,7 +307,8 @@ class Ensemble:
                     q.pop(0)
 
             tree.new_format = cp.array(nf, dtype=cp.float32)
-            tree.new_format_offsets = cp.array(gr_subtree_offsets, dtype=cp.int32)
+            print(tree.group_index)
+            tree.new_format_offsets = cp.array(tree.group_index, dtype=cp.int32)
 
             # new arrays for output indexing
             ns = [0]
