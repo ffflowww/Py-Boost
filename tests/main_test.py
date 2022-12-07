@@ -66,14 +66,14 @@ if __name__ == '__main__':
         "x_size": 1050000,
         "feat_size": 50,
         "y_size": 16,
-        "n_trees": 300
+        "n_trees": 20
     }
 
     with nvtx.annotate("Test case 1, OneVsAll"):
-        test_reg("OneVsAll", batch_size=100000, params=params)
+        test_reg("OneVsAll", batch_size=10000, params=params)
 
     with nvtx.annotate("Test case 2, Single"):
-        test_reg("Single", batch_size=100000, params=params)
+        test_reg("Single", batch_size=10000, params=params)
 
     print("Finish tests")
 

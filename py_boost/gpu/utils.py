@@ -635,8 +635,8 @@ tree_prediction_kernel = cp.RawKernel(
         long long i_out_offset = i_ * n_out;
         long long  value_offset = (-n_node - 1) * n_out;
         for(int g = 0; g < n_out; ++g) {
-            if(j_ == indexes[g] {
-                res[i_out_offset + g] = values[value_offset + g]
+            if(j_ == indexes[g]) {
+                res[i_out_offset + g] = values[value_offset + g];
             }
         }
     }
