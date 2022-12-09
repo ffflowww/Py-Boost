@@ -66,7 +66,7 @@ if __name__ == '__main__':
         "x_size": 1050000,
         "feat_size": 50,
         "y_size": 16,
-        "n_trees": 200
+        "n_trees": 100
     }
 
     with nvtx.annotate("Test case 1, OneVsAll"):
