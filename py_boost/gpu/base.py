@@ -400,28 +400,25 @@ class Ensemble:
 
                 gpu_pred[nst][:] = self.base_score
 
-                print("%%%")
-                print(gpu_pred[nst])
-
                 for n, tree in enumerate(self.models):
                     # tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
                     tree.predict_fast(gpu_batch[nst], gpu_pred[nst])
 
                 if k >= 2:
                     print("@@@")
-                    print(cpu_pred[nst][:2])
+                    print(cpu_pred[nst][0])
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
-                    print(cpu_pred_full[i - 2 * batch_size: i - batch_size][:2])
+                    print(cpu_pred_full[i - 2 * batch_size: i - batch_size][0])
 
                 stream.synchronize()
                 print("!!!")
-                print(gpu_pred[nst].get()[:2])
+                print(gpu_pred[nst].get()[0])
 
                 self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
 
                 cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
 
-                print(cpu_pred[nst][:2])
+                print(cpu_pred[nst][0])
 
 
 
