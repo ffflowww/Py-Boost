@@ -2,6 +2,7 @@
 
 import cupy as cp
 import numpy as np
+import time
 
 from .utils import pinned_array
 from ..quantization.base import QuantileQuantizer, UniformQuantizer, UniquantQuantizer
@@ -402,10 +403,14 @@ class Ensemble:
                 for n, tree in enumerate(self.models):
                     tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
+                time.sleep(1)
                 if k >= 2:
-                    cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size].copy()
+                    cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
 
+                time.sleep(1)
                 self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
+
+                time.sleep(1)
                 cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                 last_batch_size = real_batch_len
