@@ -400,6 +400,9 @@ class Ensemble:
 
                 gpu_pred[nst][:] = self.base_score
 
+                print("%%%")
+                print(gpu_pred[nst])
+
                 for n, tree in enumerate(self.models):
                     # tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
                     tree.predict_fast(gpu_batch[nst], gpu_pred[nst])
