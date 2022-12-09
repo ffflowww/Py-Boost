@@ -332,9 +332,11 @@ class Ensemble:
             #     tree.new_all_indexes = tree.new_indexes.copy()
             # else:
             #     tree.new_all_indexes = tree.new_all_indexes.append(tree.new_indexes + all_length)
-            print(f"Tree #{n}")
-            print(tree.new_format)
-            print(tree.new_indexes)
+
+            with np.printoptions(threshold=np.inf):
+                print(f"Tree #{n}")
+                print(tree.new_format)
+                print(tree.new_indexes)
         self._new_format_created = True
 
     def cnf2(self):
