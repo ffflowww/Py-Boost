@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import cupy as cp
 from py_boost import GradientBoosting
+import matplotlib.pyplot as plt
 
 
 def test_reg(target_splitter, batch_size, params):
@@ -33,6 +34,9 @@ def test_reg(target_splitter, batch_size, params):
 
     print(f"\ny_preds[900000:900005]:")
     print(yp_orig[900000:900005])
+
+    plt.plot(yp_orig - y_test)
+    plt.savefig('error.png')
 
 
 if __name__ == '__main__':
