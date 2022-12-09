@@ -611,7 +611,7 @@ tree_prediction_kernel = cp.RawKernel(
 
         // going through the tree
         while (n_node >= 0) {
-            nd = tree[tree_offset + n_node];
+            nd = tree[n_node];
 
             n_feat_raw = (int)nd.x;
             x = X[x_feat_offset + abs(n_feat_raw) - 1];
