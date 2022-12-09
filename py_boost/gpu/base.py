@@ -393,11 +393,11 @@ class Ensemble:
                 real_batch_len = batch_size if i + batch_size <= X.shape[0] else X.shape[0] - i
 
                 print(f"Real batch: {real_batch_len}")
+                print(f"Range: {i}, {i + real_batch_len}")
 
                 if k >= 2:
                     cpu_batch_free_event[nst].synchronize()
                 cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
-                print(f"CP B: {i}, {i+real_batch_len}")
 
                 if k >= 2:
                     cpu_out_ready_event[nst].synchronize()
@@ -411,11 +411,9 @@ class Ensemble:
                     tree.predict_fast(gpu_batch[nst], gpu_pred[nst])
 
                 if k >= 2:
-                    print("@@@")
+                    print(f"@@@ cpu_full_write: {i - 2 * batch_size}, {i - batch_size}")
                     print(cpu_pred[nst][0])
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
-                    print(cpu_pred_full[i - 2 * batch_size: i - batch_size][0])
-                    print(f"cpfull: {i-2*batch_size}, {i-batch_size}")
 
                 stream.synchronize()
                 print("!!!")
@@ -424,8 +422,6 @@ class Ensemble:
                 self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
 
                 cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
-
-                print(cpu_pred[nst][0])
 
 
 
