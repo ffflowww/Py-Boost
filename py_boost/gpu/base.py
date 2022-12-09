@@ -272,12 +272,14 @@ class Ensemble:
             gr_subtree_offsets = np.zeros(n_gr, dtype=np.int32)
 
             # memory allocation for new tree array
+            nfs = []
             total_size = 0
             for i in range(n_gr):
-                total_size += (tree.feats[i] >= 0).sum()
+                tree_size = (tree.feats[i] >= 0).sum()
+                total_size += tree_size
                 if i < n_gr - 1:
                     gr_subtree_offsets[i + 1] = total_size
-            nf = np.zeros(total_size * 4, dtype=np.float32)
+                nfs.append(np.zeros(tree_size * 4, dtype=np.float32))
 
             # reformatting the tree
             for i in range(n_gr):
@@ -285,27 +287,36 @@ class Ensemble:
                 while len(q) != 0:  # BFS
                     n_old, n_new = q[0]
                     if tree.nans[i][n_old] is True:
-                        nf[4 * (gr_subtree_offsets[i] + n_new)] = float(tree.feats[i][n_old] + 1)
+                        nfs[i][4 * n_new] = float(tree.feats[i][n_old] + 1)
                     else:
-                        nf[4 * (gr_subtree_offsets[i] + n_new)] = float(-(tree.feats[i][n_old] + 1))
-                    nf[4 * (gr_subtree_offsets[i] + n_new) + 1] = float(tree.val_splits[i][n_old])
+                        nfs[i][4 * n_new] = float(-(tree.feats[i][n_old] + 1))
+                    nfs[i][4 * n_new + 1] = float(tree.val_splits[i][n_old])
                     ln = tree.split[i][n_old][0]
                     rn = tree.split[i][n_old][1]
 
                     if tree.feats[i][ln] < 0:
-                        nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(-(tree.leaves[ln][i] + 1))
+                        nfs[i][4 * n_new + 2] = float(-(tree.leaves[ln][i] + 1))
                     else:
                         new_node_number = q[-1][1] + 1
-                        nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(new_node_number + gr_subtree_offsets[i])
+                        nfs[i][4 * n_new + 2] = float(new_node_number)
                         q.append((ln, new_node_number))
 
                     if tree.feats[i][rn] < 0:
-                        nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(-(tree.leaves[rn][i] + 1))
+                        nfs[i][4 * n_new + 3] = float(-(tree.leaves[rn][i] + 1))
                     else:
                         new_node_number = q[-1][1] + 1
-                        nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(new_node_number + gr_subtree_offsets[i])
+                        nfs[i][4 * n_new + 3] = float(new_node_number)
                         q.append((rn, new_node_number))
                     q.pop(0)
+
+            nf = nfs[0].copy()
+            for i in range(1, n_gr):
+                for j in range(nfs[i].shape[0] // 4):
+                    if nfs[i][4 * j + 2] > 0:
+                        nfs[i][4 * j + 2] += gr_subtree_offsets[i]
+                    if nfs[i][4 * j + 3] > 0:
+                        nfs[i][4 * j + 3] += gr_subtree_offsets[i]
+                nf = np.append(nf, nfs[i])
 
             tree.new_format = cp.array(nf, dtype=cp.float32)
 
