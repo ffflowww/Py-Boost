@@ -20,9 +20,13 @@ def test_reg(target_splitter, batch_size, params):
     with nvtx.annotate("pred orig"):
         yp_orig = model.predict(X_test, batch_size=batch_size)
 
+    print(f"X_test shape: {X_test.shape}")
+    print(f"y_pred shape: {yp_orig.shape}")
+
     for i in range(0, X_test.shape[0], batch_size):
         print(f"Step: {i}")
-        print(yp_orig[i])
+        print(f"X_test[{i}]: {X_test[i]}")
+        print(f"y_pred[{i}]: {yp_orig[i]}")
 
 
 if __name__ == '__main__':
