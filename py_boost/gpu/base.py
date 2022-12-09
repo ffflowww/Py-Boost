@@ -266,6 +266,7 @@ class Ensemble:
         # to the value written in feats an extra "1" is added to deal with zero
         # if left/right node is negative, it means that it shows index in values array (abs)
         # in case of negative value an extra "1" is added to deal with zero
+        all_length = 0
         for n, tree in enumerate(self.models):
             n_gr = tree.ngroups
             gr_subtree_offsets = np.zeros(n_gr, dtype=np.int32)
@@ -323,8 +324,28 @@ class Ensemble:
             tree.new_out_sizes = cp.array(ns, dtype=cp.int32)
             tree.new_out_indexes = cp.array(ni, dtype=cp.int32)
 
+
+            # new way
             tree.new_indexes = cp.array(tree.group_index, dtype=cp.int32)
+
+            # if tree.new_all_indexes is None:
+            #     tree.new_all_indexes = tree.new_indexes.copy()
+            # else:
+            #     tree.new_all_indexes = tree.new_all_indexes.append(tree.new_indexes + all_length)
+            print(f"Tree #{n}")
+            print(tree.new_format)
+            print(tree.new_indexes)
         self._new_format_created = True
+
+    def cnf2(self):
+        nfl = 0
+        nfol = 0
+        nil = self.base_score.shape[0] * len(self.models)
+        for n, tree in enumerate(self.models):
+            nfl += tree.new_format.shape[0]
+            # tree.new_format_offsets
+            # tree.new_indexes
+            pass
 
     def predict_new(self, X, batch_size=100000):
         self.to_device()
