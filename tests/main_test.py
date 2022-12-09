@@ -25,8 +25,14 @@ def test_reg(target_splitter, batch_size, params):
 
     for i in range(0, X_test.shape[0], batch_size):
         print(f"Step: {i}")
-        print(f"X_test[{i}]: {X_test[i]}")
         print(f"y_pred[{i}]: {yp_orig[i]}")
+
+    print("Some troubles with last preds?")
+    print(f"y_preds[800000:800005]:")
+    print(yp_orig[800000:800005])
+
+    print(f"\ny_preds[800000:800005]:")
+    print(yp_orig[900000:900005])
 
 
 if __name__ == '__main__':
