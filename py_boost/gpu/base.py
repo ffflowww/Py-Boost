@@ -405,9 +405,13 @@ class Ensemble:
                     tree.predict_fast(gpu_batch[nst], gpu_pred[nst])
 
                 if k >= 2:
+                    print("@@@")
+                    print(cpu_pred[nst][:10])
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
+                    print(cpu_pred_full[i - 2 * batch_size: i - batch_size])
 
                 stream.synchronize()
+                print("!!!")
                 print(gpu_pred[nst].get()[:10])
 
                 self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
