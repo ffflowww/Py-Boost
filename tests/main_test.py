@@ -31,7 +31,7 @@ def test_reg(target_splitter, batch_size, params):
     print(f"y_preds[800000:800005]:")
     print(yp_orig[800000:800005])
 
-    print(f"\ny_preds[800000:800005]:")
+    print(f"\ny_preds[900000:900005]:")
     print(yp_orig[900000:900005])
 
 
