@@ -295,15 +295,15 @@ class Ensemble:
                     if tree.feats[i][ln] < 0:
                         nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(-(tree.leaves[ln][i] + 1))
                     else:
-                        new_node_number = q[-1][1] + 1 + gr_subtree_offsets[i]
-                        nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(new_node_number)
+                        new_node_number = q[-1][1] + 1
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(new_node_number + gr_subtree_offsets[i])
                         q.append((ln, new_node_number))
 
                     if tree.feats[i][rn] < 0:
                         nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(-(tree.leaves[rn][i] + 1))
                     else:
-                        new_node_number = q[-1][1] + 1 + gr_subtree_offsets[i]
-                        nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(new_node_number)
+                        new_node_number = q[-1][1] + 1
+                        nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(new_node_number + gr_subtree_offsets[i])
                         q.append((rn, new_node_number))
                     q.pop(0)
 
@@ -334,7 +334,7 @@ class Ensemble:
             #     tree.new_all_indexes = tree.new_all_indexes.append(tree.new_indexes + all_length)
 
             with np.printoptions(threshold=np.inf):
-                print(f"Tree #{n}")
+                # print(f"Tree #{n}")
                 print(tree.new_format)
                 print(tree.new_indexes)
         self._new_format_created = True
