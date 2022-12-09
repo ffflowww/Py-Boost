@@ -54,9 +54,9 @@ def test_reg(target_splitter, batch_size, params):
     # np.savetxt("ok_lines.txt", ol)
     if len(trouble_lines) > 0:
         print(f"Troubles from: {tl[0]} till {tl[-1]}")
-        print(yp_orig[tl[0]: tl[0]+5])
+        print(yp_orig[tl[0]])
         print("---")
-        print(yp_fast[tl[0]: tl[0]+5])
+        print(yp_fast[tl[0]])
     else:
         print("All good")
 

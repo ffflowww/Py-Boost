@@ -380,6 +380,9 @@ class Ensemble:
         cpu_batch = [pinned_array(np.empty(X[0:batch_size].shape, dtype=cur_dtype)) for _ in range(n_streams)]
         gpu_batch = [cp.empty(X[0:batch_size].shape, dtype=cur_dtype) for _ in range(n_streams)]
 
+        print(f"cpu batch: {cpu_batch[0].shape}, {cpu_batch[1].shape}")
+        print(f"gpu batch: {gpu_batch[0].shape}, {gpu_batch[1].shape}")
+
         cpu_batch_free_event = [None, None]
         cpu_out_ready_event = [None, None]
         last_batch_size = 0
@@ -389,9 +392,12 @@ class Ensemble:
             with map_streams[nst] as stream:
                 real_batch_len = batch_size if i + batch_size <= X.shape[0] else X.shape[0] - i
 
+                print(f"Real batch: {real_batch_len}")
+
                 if k >= 2:
                     cpu_batch_free_event[nst].synchronize()
                 cpu_batch[nst][:real_batch_len] = X[i:i + real_batch_len].astype(cur_dtype)
+                print(f"CP B: {i}, {i+real_batch_len}")
 
                 if k >= 2:
                     cpu_out_ready_event[nst].synchronize()
@@ -409,6 +415,7 @@ class Ensemble:
                     print(cpu_pred[nst][0])
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
                     print(cpu_pred_full[i - 2 * batch_size: i - batch_size][0])
+                    print(f"cpfull: {i-2*batch_size}, {i-batch_size}")
 
                 stream.synchronize()
                 print("!!!")
