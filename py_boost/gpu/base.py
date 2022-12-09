@@ -345,10 +345,10 @@ class Ensemble:
             # else:
             #     tree.new_all_indexes = tree.new_all_indexes.append(tree.new_indexes + all_length)
 
-            with np.printoptions(threshold=np.inf):
-                print(f"Tree #{n}")
-                print(tree.new_format)
-                print(tree.new_indexes)
+            # with np.printoptions(threshold=np.inf):
+            #     print(f"Tree #{n}")
+            #     print(tree.new_format)
+            #     print(tree.new_indexes)
         self._new_format_created = True
 
     def cnf2(self):
@@ -404,15 +404,19 @@ class Ensemble:
                     # tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
                     tree.predict_fast(gpu_batch[nst], gpu_pred[nst])
 
-                time.sleep(1)
                 if k >= 2:
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
 
-                time.sleep(1)
+                stream.synchronize()
+                print(gpu_pred[nst].get()[:10])
+
                 self.postprocess_fn(gpu_pred[nst][:real_batch_len]).get(out=cpu_pred[nst][:real_batch_len])
 
-                time.sleep(1)
                 cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
+
+                print(cpu_pred[nst][:10])
+
+
 
                 last_batch_size = real_batch_len
                 last_n_stream = nst
