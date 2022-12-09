@@ -602,9 +602,8 @@ tree_prediction_kernel = cp.RawKernel(
         int j_ = threadIdx.x;
 
         long long x_feat_offset = n_features * i_;
-        int tree_offset = gr_subtree_offsets[j_];
 
-        int n_node = 0;
+        int n_node = gr_subtree_offsets[j_];
         float4 nd;
         float x;
         int n_feat_raw;
