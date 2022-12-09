@@ -284,7 +284,7 @@ class Ensemble:
                 q = [(0, 0)]
                 while len(q) != 0:  # BFS
                     n_old, n_new = q[0]
-                    if tree.nans[i][n_old] is False:
+                    if tree.nans[i][n_old] is True:
                         nf[4 * (gr_subtree_offsets[i] + n_new)] = float(tree.feats[i][n_old] + 1)
                     else:
                         nf[4 * (gr_subtree_offsets[i] + n_new)] = float(-(tree.feats[i][n_old] + 1))
@@ -295,14 +295,14 @@ class Ensemble:
                     if tree.feats[i][ln] < 0:
                         nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(-(tree.leaves[ln][i] + 1))
                     else:
-                        new_node_number = q[-1][1] + 1
+                        new_node_number = q[-1][1] + 1 + gr_subtree_offsets[i]
                         nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(new_node_number)
                         q.append((ln, new_node_number))
 
                     if tree.feats[i][rn] < 0:
                         nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(-(tree.leaves[rn][i] + 1))
                     else:
-                        new_node_number = q[-1][1] + 1
+                        new_node_number = q[-1][1] + 1 + gr_subtree_offsets[i]
                         nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(new_node_number)
                         q.append((rn, new_node_number))
                     q.pop(0)
