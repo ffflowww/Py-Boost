@@ -281,7 +281,7 @@ class Ensemble:
             print("!!!")
             print(total_size)
             print(type(total_size))
-            total_size = total_size[0]
+            total_size = int(total_size)
             print("@@@@")
             print(total_size)
             print(type(total_size))
