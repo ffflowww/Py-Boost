@@ -354,6 +354,13 @@ class Ensemble:
         self.all_out_sizes = np.append(all_out_sizes)
         self.all_out_indexes = np.append(all_out_indexes)
 
+        self.all_trees = cp.array(self.all_trees, dtype=cp.float32)
+        self.all_tree_offsets = cp.array(self.all_tree_offsets, dtype=cp.int32)
+        self.all_values = cp.array(self.all_values, dtype=cp.float32)
+        self.all_values_offset = cp.array(self.all_values_offset, dtype=cp.int32)
+        self.all_out_sizes = cp.array(self.all_out_sizes, dtype=cp.int32)
+        self.all_out_indexes = cp.array(self.all_out_indexes, dtype=cp.int32)
+
     def pred(self, X, res):
         n_models = len(self.models)
         def get_optimal_cuda_params(nrows, ngroups, nmodels):
