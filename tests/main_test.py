@@ -18,8 +18,8 @@ def test_reg(target_splitter, batch_size, params):
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
 
     print("Testing orig...")
-    with nvtx.annotate("pred orig"):
-        yp_orig = model.predict(X_test, batch_size=batch_size)
+    with nvtx.annotate("pred new"):
+        yp_orig = model.predict_new(X_test, batch_size=batch_size)
 
     print(f"X_test shape: {X_test.shape}")
     print(f"y_pred shape: {yp_orig.shape}")
