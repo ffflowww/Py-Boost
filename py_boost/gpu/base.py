@@ -417,8 +417,9 @@ class Ensemble:
 
                 gpu_pred[nst][:] = self.base_score
 
-                for n, tree in enumerate(self.models):
-                    tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+                # for n, tree in enumerate(self.models):
+                    # tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+                self.pred(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                 if k >= 2:
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
