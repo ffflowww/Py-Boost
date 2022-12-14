@@ -321,10 +321,10 @@ class Ensemble:
             # new arrays for output indexing
             ns = [0]
             ni = []
-            gri = np.array(tree.group_index, dtype=np.int32)
+            gri = np.array(tree.group_index.get(), dtype=np.int32)
             for gr_ind in range(tree.ngroups):
                 ns.append((gri == gr_ind).sum() + ns[-1])
-                for en, ind in enumerate(tree.group_index):
+                for en, ind in enumerate(tree.group_index.get()):
                     if ind == gr_ind:
                         ni.append(en)
             tree.new_out_sizes = cp.array(ns, dtype=cp.int32)
