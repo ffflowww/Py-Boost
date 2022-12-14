@@ -5,6 +5,8 @@ import numpy as np
 
 from .utils import pinned_array
 from ..quantization.base import QuantileQuantizer, UniformQuantizer, UniquantQuantizer
+from .utils import tree_prediction_kernel_alltogether
+
 
 class Ensemble:
     """
@@ -321,6 +323,60 @@ class Ensemble:
             tree.new_out_sizes = cp.array(ns, dtype=cp.int32)
             tree.new_out_indexes = cp.array(ni, dtype=cp.int32)
         self._new_format_created = True
+
+    def group_together(self):
+        all_trees = []
+        all_tree_offsets = []
+        all_values = []
+        all_values_offset = []
+        all_out_sizes = []
+        all_out_indexes = []
+        total_tree_offset = 0
+        total_value_offset = 0
+        for n, tree in enumerate(self.models):
+            all_trees.append(tree.new_format)
+            all_tree_offsets.append(tree.new_format_offsets + total_tree_offset)
+            all_values.append(tree.values)
+            all_values_offset.append(total_value_offset)
+            all_out_sizes.append(tree.new_out_sizes)
+            all_out_indexes.append(tree.new_out_indexes)
+
+            total_tree_offset += len(tree.new_format) // 4
+            total_value_offset += len(tree.values)
+
+        self.all_trees = np.append(all_trees)
+        self.all_tree_offsets = np.append(all_tree_offsets)
+        self.all_values = np.append(all_values)
+        self.all_values_offset = np.append(all_values_offset)
+        self.all_out_sizes = np.append(all_out_sizes)
+        self.all_out_indexes = np.append(all_out_indexes)
+
+    def pred(self, X, res):
+        n_models = len(self.models)
+        def get_optimal_cuda_params(nrows, ngroups, nmodels):
+            assert ngroups <= 1024
+            if ngroups >= 512:
+                return (nrows, nmodels), (ngroups, 1)
+            nr = 512 // ngroups
+            if nrows > nr:
+                while nrows % nr > 0:
+                    nr = nr // 2
+                return (nrows // nr, nmodels), (ngroups, nr)
+            else:
+                return (nrows, nmodels), (ngroups, 1)
+
+        blocks, threads = get_optimal_cuda_params(X.shape[0], self.models[0].ngroups, n_models)
+
+        tree_prediction_kernel_alltogether(blocks, threads, ((X,
+                                                              self.all_trees,
+                                                              self.all_tree_offsets,
+                                                              self.all_values,
+                                                              self.all_values_offset,
+                                                              self.all_out_sizes,
+                                                              self.all_out_indexes,
+                                                              X.shape[1],
+                                                              len(self.base_score),
+                                                              res)))
 
     def predict_new(self, X, batch_size=100000):
         self.to_device()
