@@ -281,6 +281,10 @@ class Ensemble:
             print("!!!")
             print(total_size)
             print(type(total_size))
+            total_size = total_size[0]
+            print("@@@@")
+            print(total_size)
+            print(type(total_size))
             nf = np.zeros(total_size * 4, dtype=np.float32)
 
             # reformatting the tree
