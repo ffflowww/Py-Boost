@@ -278,6 +278,9 @@ class Ensemble:
                 total_size += (tree.feats[i] >= 0).sum()
                 if i < n_gr - 1:
                     gr_subtree_offsets[i + 1] = total_size
+            print("!!!")
+            print(total_size)
+            print(type(total_size))
             nf = np.zeros(total_size * 4, dtype=np.float32)
 
             # reformatting the tree
