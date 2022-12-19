@@ -17,15 +17,35 @@ def test_reg(target_splitter, batch_size, params):
                              max_bin=256, max_depth=6, target_splitter=target_splitter)
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
 
+    print("Reformatting")
+    with nvtx.annotate("reformatting"):
+        model.create_new_format()
+
+    print("Testing orig prob...")
+    with nvtx.annotate("pred orig prob"):
+        model.predict(X_test[:32*32], batch_size=batch_size)
     print("Testing orig...")
     with nvtx.annotate("pred orig"):
         yp_orig = model.predict(X_test, batch_size=batch_size)
 
-    print("Testing new...")
-    with nvtx.annotate("reformatting"):
-        model.create_new_format()
-    with nvtx.annotate("pred new"):
-        yp_new = model.predict_new(X_test, batch_size=batch_size)
+    print("Testing fast prob...")
+    with nvtx.annotate("pred fast prob"):
+        model.predict_new(X_test[:32*32], batch_size=batch_size)
+    print("Testing fast...")
+    with nvtx.annotate("pred fast"):
+        yp_fast = model.predict_new(X_test, batch_size=batch_size)
+
+    print("Testing fast prob all...")
+    with nvtx.annotate("pred fast prob all"):
+        model.predict_new(X_test[:32 * 32], batch_size=batch_size)
+    print("Testing fast all...")
+    with nvtx.annotate("pred fast all"):
+        yp_fast_all = model.predict_new(X_test, batch_size=batch_size)
+
+    diff = yp_orig - yp_fast
+    diff2 = yp_orig - yp_fast_all
+    print(f"Outs diff: {diff.sum()}")
+    print(f"Outs diff2: {diff2.sum()}")
 
     # print(f"X_test shape: {X_test.shape}")
     # print(f"y_pred shape: {yp_orig.shape}")
@@ -41,8 +61,15 @@ def test_reg(target_splitter, batch_size, params):
     # print(f"\ny_preds[900000:900005]:")
     # print(yp_orig[900000:900005])
 
-    plt.plot(yp_new - y_test)
-    plt.savefig('error.png')
+    plt.plot(yp_orig - y_test)
+    plt.savefig('error_orig.png')
+    plt.clf()
+    plt.plot(yp_fast - y_test)
+    plt.savefig('error_fast.png')
+    plt.clf()
+    plt.plot(yp_fast_all - y_test)
+    plt.savefig('error_fast_all.png')
+    plt.clf()
 
 
 if __name__ == '__main__':

@@ -386,7 +386,7 @@ class Ensemble:
                                                               len(self.base_score),
                                                               res)))
 
-    def predict_new(self, X, batch_size=100000):
+    def predict_new(self, X, batch_size=100000, is_all=False):
         self.to_device()
         if not self._new_format_created:
             self.create_new_format()
@@ -425,9 +425,11 @@ class Ensemble:
 
                 gpu_pred[nst][:] = self.base_score
 
-                # for n, tree in enumerate(self.models):
-                    # tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
-                self.pred(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+                if is_all:
+                    self.pred(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+                else:
+                    for n, tree in enumerate(self.models):
+                        tree.predict_fast(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                 if k >= 2:
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
