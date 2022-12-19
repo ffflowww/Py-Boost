@@ -345,12 +345,12 @@ class Ensemble:
             total_tree_offset += len(tree.new_format) // 4
             total_value_offset += len(tree.values)
 
-        self.all_trees = np.append(all_trees)
-        self.all_tree_offsets = np.append(all_tree_offsets)
-        self.all_values = np.append(all_values)
-        self.all_values_offset = np.append(all_values_offset)
-        self.all_out_sizes = np.append(all_out_sizes)
-        self.all_out_indexes = np.append(all_out_indexes)
+        self.all_trees = np.append(all_trees[0], all_trees[1:])
+        self.all_tree_offsets = np.append(all_tree_offsets[0], all_tree_offsets[1:])
+        self.all_values = np.append(all_values[0], all_values[1:])
+        self.all_values_offset = np.append(all_values_offset[0], all_values_offset[1:])
+        self.all_out_sizes = np.append(all_out_sizes[0], all_out_sizes[1:])
+        self.all_out_indexes = np.append(all_out_indexes[0], all_out_indexes[1:])
 
         self.all_trees = cp.array(self.all_trees, dtype=cp.float32)
         self.all_tree_offsets = cp.array(self.all_tree_offsets, dtype=cp.int32)
