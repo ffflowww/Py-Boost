@@ -275,16 +275,9 @@ class Ensemble:
             # memory allocation for new tree array
             total_size = 0
             for i in range(n_gr):
-                total_size += (tree.feats[i] >= 0).sum()
+                total_size += int((tree.feats[i] >= 0).sum())
                 if i < n_gr - 1:
                     gr_subtree_offsets[i + 1] = total_size
-            print("!!!")
-            print(total_size)
-            print(type(total_size))
-            total_size = int(total_size)
-            print("@@@@")
-            print(total_size)
-            print(type(total_size))
             nf = np.zeros(total_size * 4, dtype=np.float32)
 
             # reformatting the tree
@@ -329,6 +322,7 @@ class Ensemble:
                         ni.append(en)
             tree.new_out_sizes = cp.array(ns, dtype=cp.int32)
             tree.new_out_indexes = cp.array(ni, dtype=cp.int32)
+        self.group_together()
         self._new_format_created = True
 
     def group_together(self):
