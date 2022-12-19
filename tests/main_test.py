@@ -18,24 +18,30 @@ def test_reg(target_splitter, batch_size, params):
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
 
     print("Testing orig...")
+    with nvtx.annotate("pred orig"):
+        yp_orig = model.predict(X_test, batch_size=batch_size)
+
+    print("Testing new...")
+    with nvtx.annotate("reformatting"):
+        model.create_new_format()
     with nvtx.annotate("pred new"):
-        yp_orig = model.predict_new(X_test, batch_size=batch_size)
+        yp_new = model.predict_new(X_test, batch_size=batch_size)
 
-    print(f"X_test shape: {X_test.shape}")
-    print(f"y_pred shape: {yp_orig.shape}")
+    # print(f"X_test shape: {X_test.shape}")
+    # print(f"y_pred shape: {yp_orig.shape}")
+    #
+    # for i in range(0, X_test.shape[0], batch_size):
+    #     print(f"Step: {i}")
+    #     print(f"y_pred[{i}]: {yp_orig[i]}")
+    #
+    # print("Some troubles with last preds?")
+    # print(f"y_preds[800000:800005]:")
+    # print(yp_orig[800000:800005])
+    #
+    # print(f"\ny_preds[900000:900005]:")
+    # print(yp_orig[900000:900005])
 
-    for i in range(0, X_test.shape[0], batch_size):
-        print(f"Step: {i}")
-        print(f"y_pred[{i}]: {yp_orig[i]}")
-
-    print("Some troubles with last preds?")
-    print(f"y_preds[800000:800005]:")
-    print(yp_orig[800000:800005])
-
-    print(f"\ny_preds[900000:900005]:")
-    print(yp_orig[900000:900005])
-
-    plt.plot(yp_orig - y_test)
+    plt.plot(yp_new - y_test)
     plt.savefig('error.png')
 
 
