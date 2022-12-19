@@ -17,16 +17,16 @@ def test_reg(target_splitter, batch_size, params):
                              max_bin=256, max_depth=6, target_splitter=target_splitter)
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
 
-    print("Reformatting")
-    with nvtx.annotate("reformatting"):
-        model.create_new_format()
-
     print("Testing orig prob...")
     with nvtx.annotate("pred orig prob"):
         model.predict(X_test[:32*32], batch_size=batch_size)
     print("Testing orig...")
     with nvtx.annotate("pred orig"):
         yp_orig = model.predict(X_test, batch_size=batch_size)
+
+    print("Reformatting")
+    with nvtx.annotate("reformatting"):
+        model.create_new_format()
 
     print("Testing fast prob...")
     with nvtx.annotate("pred fast prob"):
@@ -37,10 +37,10 @@ def test_reg(target_splitter, batch_size, params):
 
     print("Testing fast prob all...")
     with nvtx.annotate("pred fast prob all"):
-        model.predict_new(X_test[:32 * 32], batch_size=batch_size)
+        model.predict_new(X_test[:32 * 32], batch_size=batch_size, is_all=True)
     print("Testing fast all...")
     with nvtx.annotate("pred fast all"):
-        yp_fast_all = model.predict_new(X_test, batch_size=batch_size)
+        yp_fast_all = model.predict_new(X_test, batch_size=batch_size, is_all=True)
 
     diff = yp_orig - yp_fast
     diff2 = yp_orig - yp_fast_all
