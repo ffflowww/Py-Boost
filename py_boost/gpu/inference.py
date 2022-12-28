@@ -125,10 +125,9 @@ class EnsembleInference:
         map_streams = [cp.cuda.Stream() for _ in range(n_streams)]
 
         # result allocation
-        n_out = self.base_score.get().shape[0]
-        cpu_pred_full = np.empty((X.shape[0], n_out), dtype=cur_dtype)
-        cpu_pred = [pinned_array(np.empty((batch_size, n_out), dtype=cur_dtype)) for _ in range(n_streams)]
-        gpu_pred = [cp.empty((batch_size, n_out), dtype=cur_dtype) for _ in range(n_streams)]
+        cpu_pred_full = np.empty((X.shape[0], self.n_out), dtype=cur_dtype)
+        cpu_pred = [pinned_array(np.empty((batch_size, self.n_out), dtype=cur_dtype)) for _ in range(n_streams)]
+        gpu_pred = [cp.empty((batch_size, self.n_out), dtype=cur_dtype) for _ in range(n_streams)]
 
         # batch allocation
         cpu_batch = [pinned_array(np.empty(X[0:batch_size].shape, dtype=cur_dtype)) for _ in range(n_streams)]
@@ -153,6 +152,7 @@ class EnsembleInference:
                 cpu_batch_free_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                 gpu_pred[nst][:] = self.base_score
+                print(gpu_pred[nst].get()[0:3])
                 self._predict_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                 if k >= 2:
