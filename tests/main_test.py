@@ -55,6 +55,11 @@ def test_reg(target_splitter, batch_size, params):
     print(yp_orig[0])
     print(yp_fast[0])
     print(yp_fast_all[0])
+    print("-----")
+    print(y_test[500_000])
+    print(yp_orig[500_000])
+    print(yp_fast[500_000])
+    print(yp_fast_all[500_000])
 
     plt.plot(yp_orig - y_test)
     plt.savefig('error_orig.png')
