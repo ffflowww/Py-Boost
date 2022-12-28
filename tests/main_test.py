@@ -77,25 +77,20 @@ def test_reg(target_splitter, batch_size, params):
     # stages = [5, 15, 20, 21, 44, 49]
     stages = [49]
 
-    ps_orig = model.predict_staged_deprecated(X_test, iterations=stages)
-    ps_new = model.predict_staged(X_test, iterations=stages)
+    ps_orig = model.predict_staged_deprecated(X_test, iterations=stages, batch_size=1000)
+    ps_new = model.predict_staged(X_test, iterations=stages, batch_size=1000)
 
     # for i in range(len(stages)):
     #     print(ps_orig[i][1])
     #     print(ps_new[i][1])
     #     print("!!!!!!!")
 
-    for i in range(100):
-        print("old")
-        print(ps_orig[0][i])
-        print("new")
-        print(ps_new[0][i])
-        print("true")
-        print(yp_fast[i])
+    print(ps_orig - ps_new)
 
     print("sum:")
     print((ps_orig - ps_new).sum())
-
+    print(ps_orig.shape)
+    print(ps_new.shape)
 
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
@@ -109,7 +104,7 @@ if __name__ == '__main__':
     # }
 
     params = {
-        "x_size": 105000,
+        "x_size": 5500,
         "feat_size": 20,
         "y_size": 6,
         "n_trees": 50
