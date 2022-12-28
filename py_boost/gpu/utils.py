@@ -593,6 +593,7 @@ tree_prediction_leaves_kernel = cp.RawKernel(
         const int* gr_subtree_offsets,
         const int n_features,
         const int n_gr,
+        const int n_out,
         const int stage,
         int* res)
     {
@@ -622,7 +623,7 @@ tree_prediction_leaves_kernel = cp.RawKernel(
         }
 
         // writing result
-        res[stage * n_gr + j_] = (-n_node - 1);
+        res[i_ * n_out + stage * n_gr + j_] = (-n_node - 1);
     }
     ''',
     'tree_prediction_leaves_kernel')
