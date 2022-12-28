@@ -118,11 +118,11 @@ if __name__ == '__main__':
     #     "n_trees": 50
     # }
 
-    with nvtx.annotate("Test case 1, OneVsAll"):
-        test_reg("OneVsAll", batch_size=100000, params=params)
+    # with nvtx.annotate("Test case 1, OneVsAll"):
+    #     test_reg("OneVsAll", batch_size=100000, params=params)
 
-    # with nvtx.annotate("Test case 2, Single"):
-    #     test_reg("Single", batch_size=100000, params=params)
+    with nvtx.annotate("Test case 2, Single"):
+        test_reg("Single", batch_size=100000, params=params)
 
     print("Finish tests")
 
