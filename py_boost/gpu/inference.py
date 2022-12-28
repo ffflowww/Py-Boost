@@ -29,8 +29,11 @@ class EnsembleInference:
             all_tree_offsets.append(tree.new_format_offsets + total_tree_offset)
             all_values.append(tree.values)
             all_values_offset.append(total_value_offset)
-            all_out_sizes.append(tree.new_out_sizes)
             all_out_indexes.append(tree.new_out_indexes)
+            if n == 0:
+                all_out_sizes.append(tree.new_out_sizes)
+            else:
+                all_out_sizes.append((tree.new_out_sizes + all_out_sizes[-1][-1])[1:])
 
             total_tree_offset += len(tree.new_format) // 4
             total_value_offset += len(tree.values)
