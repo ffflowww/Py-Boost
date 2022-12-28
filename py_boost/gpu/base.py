@@ -317,7 +317,7 @@ class Ensemble:
                 gpu_leaves[nst][:] = 0
 
                 for j, n in enumerate(iterations):
-                    self.models[n].predict_leaf(gpu_batch[nst][:real_batch_len], gpu_leaves[nst][:real_batch_len][j])
+                    self.models[n].predict_leaf(gpu_batch[nst][:real_batch_len], gpu_leaves[nst][:real_batch_len], j)
 
                 if k >= 2:
                     cpu_leaves_full[i - 2 * batch_size: i - batch_size] = cpu_leaves[nst][:batch_size]

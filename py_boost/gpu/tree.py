@@ -201,7 +201,7 @@ class Tree:
         """
         return self.predict_leaf_from_nodes(self.predict_node(X))
 
-    def predict_leaf(self, X, res):
+    def predict_leaf(self, X, res, stage):
         """Predict leaf indices from the feature matrix X
 
         Args:
@@ -217,6 +217,7 @@ class Tree:
                                                                           self.new_format_offsets,
                                                                           X.shape[1],
                                                                           self.ngroups,
+                                                                          stage,
                                                                           res)))
 
     def predict(self, X, res):
