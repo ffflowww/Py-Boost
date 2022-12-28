@@ -127,7 +127,8 @@ class Tree:
         Returns:
 
         """
-        for attr in ['gains', 'feats', 'bin_splits', 'nans', 'split', 'val_splits', 'values', 'group_index', 'leaves']:
+        for attr in ['gains', 'feats', 'bin_splits', 'nans', 'split', 'val_splits', 'values', 'group_index', 'leaves',
+                     'new_format', 'new_format_offsets', 'new_out_indexes', 'new_out_sizes']:
             arr = getattr(self, attr)
             setattr(self, attr, cp.asarray(arr))
 
@@ -137,7 +138,8 @@ class Tree:
         Returns:
 
         """
-        for attr in ['gains', 'feats', 'bin_splits', 'nans', 'split', 'val_splits', 'values', 'group_index', 'leaves']:
+        for attr in ['gains', 'feats', 'bin_splits', 'nans', 'split', 'val_splits', 'values', 'group_index', 'leaves',
+                     'new_format', 'new_format_offsets', 'new_out_indexes', 'new_out_sizes']:
             arr = getattr(self, attr)
             if type(arr) is not np.ndarray:
                 setattr(self, attr, arr.get())
@@ -177,8 +179,8 @@ class Tree:
         """
         return apply_values(nodes, cp.arange(self.ngroups, dtype=cp.uint64), self.leaves)
 
-    def predict(self, X):
-        """Predict from the feature matrix X
+    def predict_deprecated(self, X):
+        """(DEPRECATED) Predict from the feature matrix X
 
         Args:
             X: cp.ndarray of features
@@ -199,7 +201,16 @@ class Tree:
         """
         return self.predict_leaf_from_nodes(self.predict_node(X))
 
-    def predict_fast(self, X, res):
+    def predict(self, X, res):
+        """Predict from the feature matrix X
+
+        Args:
+            X: cp.ndarray of features
+            res: cp.ndarray buffer for predictions
+
+        Returns:
+
+        """
         def get_optimal_cuda_params(nrows, ngroups):
             assert ngroups <= 1024
             if ngroups >= 512:
@@ -223,6 +234,71 @@ class Tree:
                                                   X.shape[1],
                                                   self.nout,
                                                   res)))
+
+    def reformat(self):
+        """Creates new internal format of the tree for faster inference
+
+        Returns:
+
+        """
+        # the sign of the feat value shows the behaviour in case of nan
+        # to the value written in feats an extra "1" is added to deal with zero
+        # if left/right node is negative, it means that it shows index in values array (abs)
+        # in case of negative value an extra "1" is added to deal with zero
+        n_gr = self.ngroups
+        gr_subtree_offsets = np.zeros(n_gr, dtype=np.int32)
+
+        # memory allocation for new tree array
+        total_size = 0
+        for i in range(n_gr):
+            total_size += int((self.feats[i] >= 0).sum())
+            if i < n_gr - 1:
+                gr_subtree_offsets[i + 1] = total_size
+        nf = np.zeros(total_size * 4, dtype=np.float32)
+
+        # reformatting the tree
+        for i in range(n_gr):
+            q = [(0, 0)]
+            while len(q) != 0:  # BFS
+                n_old, n_new = q[0]
+                if self.nans[i][n_old] is True:
+                    nf[4 * (gr_subtree_offsets[i] + n_new)] = float(self.feats[i][n_old] + 1)
+                else:
+                    nf[4 * (gr_subtree_offsets[i] + n_new)] = float(-(self.feats[i][n_old] + 1))
+                nf[4 * (gr_subtree_offsets[i] + n_new) + 1] = float(self.val_splits[i][n_old])
+                ln = self.split[i][n_old][0]
+                rn = self.split[i][n_old][1]
+
+                if self.feats[i][ln] < 0:
+                    nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(-(self.leaves[ln][i] + 1))
+                else:
+                    new_node_number = q[-1][1] + 1
+                    nf[4 * (gr_subtree_offsets[i] + n_new) + 2] = float(new_node_number)
+                    q.append((ln, new_node_number))
+
+                if self.feats[i][rn] < 0:
+                    nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(-(self.leaves[rn][i] + 1))
+                else:
+                    new_node_number = q[-1][1] + 1
+                    nf[4 * (gr_subtree_offsets[i] + n_new) + 3] = float(new_node_number)
+                    q.append((rn, new_node_number))
+                q.pop(0)
+
+        self.new_format = nf
+        self.new_format_offsets = gr_subtree_offsets
+
+        # new arrays for output indexing
+        ns = [0]
+        ni = []
+        gri = np.array(self.group_index, dtype=np.int32)
+        for gr_ind in range(self.ngroups):
+            ns.append((gri == gr_ind).sum() + ns[-1])
+            for en, ind in enumerate(self.group_index):
+                if ind == gr_ind:
+                    ni.append(en)
+
+        self.new_out_sizes = ns
+        self.new_out_indexes = ni
 
 
 class DepthwiseTreeBuilder:
@@ -360,5 +436,7 @@ class DepthwiseTreeBuilder:
         # transform leaves to values
         val_preds = [apply_values(x, group_index, values) for x in val_leaves]
         tree.set_node_values(values.get(), group_index.get())
+
+        tree.reformat()
 
         return tree, leaves, pred, val_leaves, val_preds

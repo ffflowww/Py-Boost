@@ -6,6 +6,7 @@ import numpy as np
 import cupy as cp
 from py_boost import GradientBoosting
 import matplotlib.pyplot as plt
+from py_boost.gpu.inference import EnsembleInference
 
 
 def test_reg(target_splitter, batch_size, params):
@@ -19,47 +20,35 @@ def test_reg(target_splitter, batch_size, params):
 
     print("Testing orig prob...")
     with nvtx.annotate("pred orig prob"):
-        model.predict(X_test[:32*32], batch_size=batch_size)
+        model.predict_deprecated(X_test[:32*32], batch_size=batch_size)
     print("Testing orig...")
     with nvtx.annotate("pred orig"):
-        yp_orig = model.predict(X_test, batch_size=batch_size)
-
-    print("Reformatting")
-    with nvtx.annotate("reformatting"):
-        model.create_new_format()
+        yp_orig = model.predict_deprecated(X_test, batch_size=batch_size)
 
     print("Testing fast prob...")
     with nvtx.annotate("pred fast prob"):
-        model.predict_new(X_test[:32*32], batch_size=batch_size)
+        model.predict(X_test[:32*32], batch_size=batch_size)
     print("Testing fast...")
     with nvtx.annotate("pred fast"):
-        yp_fast = model.predict_new(X_test, batch_size=batch_size)
+        yp_fast = model.predict(X_test, batch_size=batch_size)
 
-    print("Testing fast prob all...")
-    with nvtx.annotate("pred fast prob all"):
-        model.predict_new(X_test[:32 * 32], batch_size=batch_size, is_all=True)
-    print("Testing fast all...")
-    with nvtx.annotate("pred fast all"):
-        yp_fast_all = model.predict_new(X_test, batch_size=batch_size, is_all=True)
+    print("Creating new Inference class")
+    with nvtx.annotate("new class creating"):
+        inference = EnsembleInference(model)
+
+    print("Testing inference all prob...")
+    with nvtx.annotate("pred inference all prob"):
+        inference.predict(X_test[:32 * 32], batch_size=batch_size)
+    print("Testing inference all...")
+    with nvtx.annotate("pred inference all"):
+        yp_fast_all = inference.predict(X_test, batch_size=batch_size)
 
     diff = yp_orig - yp_fast
     diff2 = yp_orig - yp_fast_all
+    diff3 = yp_fast - yp_fast_all
     print(f"Outs diff: {diff.sum()}")
     print(f"Outs diff2: {diff2.sum()}")
-
-    # print(f"X_test shape: {X_test.shape}")
-    # print(f"y_pred shape: {yp_orig.shape}")
-    #
-    # for i in range(0, X_test.shape[0], batch_size):
-    #     print(f"Step: {i}")
-    #     print(f"y_pred[{i}]: {yp_orig[i]}")
-    #
-    # print("Some troubles with last preds?")
-    # print(f"y_preds[800000:800005]:")
-    # print(yp_orig[800000:800005])
-    #
-    # print(f"\ny_preds[900000:900005]:")
-    # print(yp_orig[900000:900005])
+    print(f"Outs diff3: {diff3.sum()}")
 
     plt.plot(yp_orig - y_test)
     plt.savefig('error_orig.png')
