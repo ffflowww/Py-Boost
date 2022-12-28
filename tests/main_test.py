@@ -74,15 +74,23 @@ def test_reg(target_splitter, batch_size, params):
     # plt.savefig('error_fast_vs_all.png')
     # plt.clf()
 
-    stages = [5, 15, 20, 21, 44]
+    stages = [5, 15, 20, 21, 44, 50]
 
     ps_orig = model.predict_staged_deprecated(X_test, iterations=stages)
     ps_new = model.predict_staged(X_test, iterations=stages)
 
-    for i in range(len(stages)):
-        print(ps_orig[i][1])
-        print(ps_new[i][1])
-        print("!!!!!!!")
+    # for i in range(len(stages)):
+    #     print(ps_orig[i][1])
+    #     print(ps_new[i][1])
+    #     print("!!!!!!!")
+
+    print("old")
+    print(ps_orig[5])
+    print("new")
+    print(ps_new[5])
+    print("!!!!!!!")
+    print("true")
+    print(yp_fast)
 
     print("sum:")
     print((ps_orig - ps_new).sum())
