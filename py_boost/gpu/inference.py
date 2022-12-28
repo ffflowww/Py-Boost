@@ -38,7 +38,6 @@ class EnsembleInference:
             total_tree_offset += len(tree.new_format) // 4
             total_value_offset += len(tree.values)
 
-        print(all_out_sizes)
         self.all_trees = np.concatenate(all_trees)
         self.all_tree_offsets = np.concatenate(all_tree_offsets)
         self.all_values = np.concatenate(all_values)
@@ -53,6 +52,14 @@ class EnsembleInference:
         self.base_score = ensemble.base_score.copy()
         self.postprocess_fn = self._default_postprocess_fn
         self._on_device = False
+
+        print(self.all_out_sizes)
+        print(self.all_out_indexes)
+        print(self.n_models)
+        print(self.n_groups)
+        print(self.n_feat)
+        print(self.n_out)
+        print(self.base_score)
 
     def to_device(self):
         """Move data to the current GPU memory
