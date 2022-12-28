@@ -91,6 +91,14 @@ def test_reg(target_splitter, batch_size, params):
     print(ps_orig.shape)
     print(ps_new.shape)
 
+    fi_orig_g = model.get_feature_importance_deprecated('gain')
+    fi_orig_s = model.get_feature_importance_deprecated('split')
+    fi_new_g = model.get_feature_importance('gain')
+    fi_new_s = model.get_feature_importance('split')
+    print("FI")
+    print((fi_orig_s - fi_new_s).sum())
+    print((fi_orig_g - fi_new_g).sum())
+
 
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
