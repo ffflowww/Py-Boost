@@ -44,6 +44,8 @@ class EnsembleInference:
 
         self.n_models = len(ensemble.models)
         self.n_groups = ensemble.models[0].ngroups
+        self.n_feat = ensemble.nfeats
+        self.n_out = len(ensemble.base_score)
         self.base_score = ensemble.base_score.copy()
         self.postprocess_fn = self._default_postprocess_fn
         self._on_device = False
@@ -102,8 +104,8 @@ class EnsembleInference:
                                                               self.all_values_offset,
                                                               self.all_out_sizes,
                                                               self.all_out_indexes,
-                                                              X.shape[1],
-                                                              len(self.base_score),
+                                                              self.n_feat,
+                                                              self.n_out,
                                                               res)))
 
     def predict(self, X, batch_size=100000):
