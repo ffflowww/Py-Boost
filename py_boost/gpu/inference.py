@@ -50,8 +50,8 @@ class EnsembleInference:
         self.postprocess_fn = self._default_postprocess_fn
         self._on_device = False
 
-        # print(self.all_out_sizes)
-        # print(self.all_out_indexes)
+        print(self.all_out_sizes)
+        print(self.all_out_indexes)
         # print(self.n_models)
         # print(self.n_groups)
         # print(self.n_feat)
