@@ -68,7 +68,7 @@ if __name__ == '__main__':
     params = {
         "x_size": 1050000,
         "feat_size": 50,
-        "y_size": 7,
+        "y_size": 16,
         "n_trees": 100
     }
 
