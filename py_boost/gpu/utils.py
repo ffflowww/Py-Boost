@@ -593,7 +593,7 @@ tree_prediction_leaves_kernel = cp.RawKernel(
         const int* gr_subtree_offsets,
         const int n_features,
         const int n_gr,
-        float* res)
+        int* res)
     {
         long long i_ = blockIdx.x * blockDim.y + threadIdx.y;
         int j_ = threadIdx.x;
@@ -621,7 +621,7 @@ tree_prediction_leaves_kernel = cp.RawKernel(
         }
 
         // writing result
-        res[i_ * n_gr + j_] = (-n_node - 1);
+        res[j_] = (-n_node - 1);
     }
     ''',
     'tree_prediction_leaves_kernel')
