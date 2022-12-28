@@ -123,7 +123,7 @@ class EnsembleInference:
         map_streams = [cp.cuda.Stream() for _ in range(n_streams)]
 
         # result allocation
-        n_out = self.base_score.shape[0]
+        n_out = self.base_score.get().shape[0]
         cpu_pred_full = np.empty((X.shape[0], n_out), dtype=cur_dtype)
         cpu_pred = [pinned_array(np.empty((batch_size, n_out), dtype=cur_dtype)) for _ in range(n_streams)]
         gpu_pred = [cp.empty((batch_size, n_out), dtype=cur_dtype) for _ in range(n_streams)]
