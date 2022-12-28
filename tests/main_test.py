@@ -79,10 +79,17 @@ if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
     print(os.environ['CONDA_DEFAULT_ENV'])
 
+    # params = {
+    #     "x_size": 1050000,
+    #     "feat_size": 50,
+    #     "y_size": 16,
+    #     "n_trees": 100
+    # }
+
     params = {
         "x_size": 1050000,
-        "feat_size": 50,
-        "y_size": 16,
+        "feat_size": 20,
+        "y_size": 8,
         "n_trees": 50
     }
 
