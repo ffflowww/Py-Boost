@@ -80,8 +80,8 @@ def test_reg(target_splitter, batch_size, params):
     ps_new = model.predict_staged(X_test, iterations=stages)
 
     for i in range(len(stages)):
-        print(ps_orig[i][0])
-        print(ps_new[i][0])
+        print(ps_orig[i][1])
+        print(ps_new[i][1])
         print("!!!!!!!")
 
     print("sum:")
