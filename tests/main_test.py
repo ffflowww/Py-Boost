@@ -106,6 +106,9 @@ def test_reg(target_splitter, batch_size, params):
     print(l_orig[1])
     print("@@@@@@@@@@")
     print(l_new[1])
+    print("shapes")
+    print(l_orig.shape)
+    print(l_new.shape)
 
 
 if __name__ == '__main__':
