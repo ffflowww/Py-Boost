@@ -360,7 +360,7 @@ class Ensemble:
 
         for tree in self.models:
             if imp_type == 'split':
-                feats = abs(tree.new_format[::4].copy()) - 1
+                feats = abs(tree.new_format[::4].copy()).astype(int) - 1
                 np.add.at(importance, feats, 1)
             else:
                 sl = tree.feats >= 0
