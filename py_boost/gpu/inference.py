@@ -30,10 +30,7 @@ class EnsembleInference:
             all_values.append(tree.values)
             all_values_offset.append(total_value_offset)
             all_out_indexes.append(tree.new_out_indexes)
-            if n == 0:
-                all_out_sizes.append(tree.new_out_sizes)
-            else:
-                all_out_sizes.append(tree.new_out_sizes[1:].copy() + all_out_sizes[-1][-1])
+            all_out_sizes.append(tree.new_out_sizes)
 
             total_tree_offset += len(tree.new_format) // 4
             total_value_offset += len(tree.values)
@@ -53,13 +50,13 @@ class EnsembleInference:
         self.postprocess_fn = self._default_postprocess_fn
         self._on_device = False
 
-        print(self.all_out_sizes)
-        print(self.all_out_indexes)
-        print(self.n_models)
-        print(self.n_groups)
-        print(self.n_feat)
-        print(self.n_out)
-        print(self.base_score)
+        # print(self.all_out_sizes)
+        # print(self.all_out_indexes)
+        # print(self.n_models)
+        # print(self.n_groups)
+        # print(self.n_feat)
+        # print(self.n_out)
+        # print(self.base_score)
 
     def to_device(self):
         """Move data to the current GPU memory
