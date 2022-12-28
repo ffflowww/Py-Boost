@@ -74,7 +74,7 @@ def test_reg(target_splitter, batch_size, params):
     # plt.savefig('error_fast_vs_all.png')
     # plt.clf()
 
-    stages = [5, 15, 20, 21, 44, 99]
+    stages = [5, 15, 20, 21, 44]
     # stages = [49]
 
     ps_orig = model.predict_staged_deprecated(X_test, iterations=stages, batch_size=100_000)
