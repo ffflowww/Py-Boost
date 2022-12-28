@@ -50,12 +50,12 @@ class EnsembleInference:
         self.postprocess_fn = self._default_postprocess_fn
         self._on_device = False
 
-        print(self.all_trees)
-        print(self.all_tree_offsets)
-        print(self.all_values)
-        print(self.all_values_offset)
-        print(self.all_out_sizes)
-        print(self.all_out_indexes)
+        # print(self.all_trees)
+        # print(self.all_tree_offsets)
+        # print(self.all_values)
+        # print(self.all_values_offset)
+        # print(self.all_out_sizes)
+        # print(self.all_out_indexes)
 
     def to_device(self):
         """Move data to the current GPU memory

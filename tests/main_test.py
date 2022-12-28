@@ -56,10 +56,10 @@ def test_reg(target_splitter, batch_size, params):
     print(yp_fast[0])
     print(yp_fast_all[0])
     print("-----")
-    print(y_test[50_000])
-    print(yp_orig[50_000])
-    print(yp_fast[50_000])
-    print(yp_fast_all[50_000])
+    print(y_test[500_000])
+    print(yp_orig[500_000])
+    print(yp_fast[500_000])
+    print(yp_fast_all[500_000])
 
     plt.plot(yp_orig - y_test)
     plt.savefig('error_orig.png')
@@ -86,12 +86,12 @@ if __name__ == '__main__':
         "n_trees": 100
     }
 
-    params = {
-        "x_size": 105000,
-        "feat_size": 1,
-        "y_size": 2,
-        "n_trees": 2
-    }
+    # params = {
+    #     "x_size": 105000,
+    #     "feat_size": 1,
+    #     "y_size": 2,
+    #     "n_trees": 2
+    # }
 
     with nvtx.annotate("Test case 1, OneVsAll"):
         test_reg("OneVsAll", batch_size=100000, params=params)
