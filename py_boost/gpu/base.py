@@ -219,7 +219,7 @@ class Ensemble:
 
                 next_out = 0
                 for n, tree in enumerate(self.models):
-                    result += tree.predict(gpu_batch)
+                    result += tree.predict_deprecated(gpu_batch)
                     if n == iterations[next_out]:
                         self.postprocess_fn(result).get(
                             stream=st, out=prediction[next_out, i: i + x_batch.shape[0]]
