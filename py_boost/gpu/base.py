@@ -174,7 +174,7 @@ class Ensemble:
                 gpu_batch.set(x_batch, stream=st)
 
                 for j, n in enumerate(iterations):
-                    self.models[n].predict_leaf(gpu_batch).get(stream=st, out=leaves[j, i: i + x_batch.shape[0]])
+                    self.models[n].predict_leaf_deprecated(gpu_batch).get(stream=st, out=leaves[j, i: i + x_batch.shape[0]])
 
                 stop_event = st.record()
                 stop_events.append(stop_event)
