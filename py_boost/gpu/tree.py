@@ -297,8 +297,8 @@ class Tree:
                 if ind == gr_ind:
                     ni.append(en)
 
-        self.new_out_sizes = ns
-        self.new_out_indexes = ni
+        self.new_out_sizes = np.array(ns, dtype=np.int32)
+        self.new_out_indexes = np.array(ni, dtype=np.int32)
 
 
 class DepthwiseTreeBuilder:
