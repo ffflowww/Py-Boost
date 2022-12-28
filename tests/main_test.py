@@ -84,13 +84,13 @@ def test_reg(target_splitter, batch_size, params):
     #     print(ps_new[i][1])
     #     print("!!!!!!!")
 
-    print("old")
-    print(ps_orig[5])
-    print("new")
-    print(ps_new[5])
-    print("!!!!!!!")
-    print("true")
-    print(yp_fast)
+    for i in range(len(yp_fast)):
+        print("old")
+        print(ps_orig[5][i])
+        print("new")
+        print(ps_new[5][i])
+        print("true")
+        print(yp_fast[i])
 
     print("sum:")
     print((ps_orig - ps_new).sum())
