@@ -33,7 +33,7 @@ class EnsembleInference:
             all_out_sizes.append(tree.new_out_sizes)
 
             total_tree_offset += len(tree.new_format) // 4
-            total_value_offset += len(tree.values)
+            total_value_offset += tree.size
 
         self.all_trees = np.concatenate(all_trees)
         self.all_tree_offsets = np.concatenate(all_tree_offsets)
