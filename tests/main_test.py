@@ -125,12 +125,12 @@ if __name__ == '__main__':
         "n_trees": 100
     }
 
-    params = {
-        "x_size": 55000,
-        "feat_size": 20,
-        "y_size": 6,
-        "n_trees": 50
-    }
+    # params = {
+    #     "x_size": 55000,
+    #     "feat_size": 20,
+    #     "y_size": 6,
+    #     "n_trees": 50
+    # }
 
     with nvtx.annotate("Test case 1, OneVsAll"):
         test_reg("OneVsAll", batch_size=100000, params=params)
