@@ -38,7 +38,7 @@ class EnsembleInference:
         self.all_trees = np.concatenate(all_trees)
         self.all_tree_offsets = np.concatenate(all_tree_offsets)
         self.all_values = np.concatenate(all_values)
-        self.all_values_offset = np.concatenate(all_values_offset)
+        self.all_values_offset = np.array(all_values_offset, dtype=np.int32)
         self.all_out_sizes = np.concatenate(all_out_sizes)
         self.all_out_indexes = np.concatenate(all_out_indexes)
 
