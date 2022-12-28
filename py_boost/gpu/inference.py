@@ -33,11 +33,12 @@ class EnsembleInference:
             if n == 0:
                 all_out_sizes.append(tree.new_out_sizes)
             else:
-                all_out_sizes.append((tree.new_out_sizes + all_out_sizes[-1][-1])[1:])
+                all_out_sizes.append(tree.new_out_sizes[1:].copy() + all_out_sizes[-1][-1])
 
             total_tree_offset += len(tree.new_format) // 4
             total_value_offset += len(tree.values)
 
+        print(all_out_sizes)
         self.all_trees = np.concatenate(all_trees)
         self.all_tree_offsets = np.concatenate(all_tree_offsets)
         self.all_values = np.concatenate(all_values)
@@ -155,7 +156,6 @@ class EnsembleInference:
                 cpu_batch_free_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                 gpu_pred[nst][:] = self.base_score
-                print(gpu_pred[nst].get()[0:3])
                 self._predict_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                 if k >= 2:
