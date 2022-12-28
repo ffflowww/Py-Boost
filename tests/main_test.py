@@ -85,10 +85,9 @@ def test_reg(target_splitter, batch_size, params):
     #     print(ps_new[i][1])
     #     print("!!!!!!!")
 
-    print(ps_orig - ps_new)
-
     print("sum:")
-    print((ps_orig - ps_new).sum())
+    print((ps_orig[5] - yp_fast).sum())
+    print((ps_new[5] - yp_fast).sum())
     print(ps_orig.shape)
     print(ps_new.shape)
 
