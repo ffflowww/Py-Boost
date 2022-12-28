@@ -15,7 +15,7 @@ def test_reg(target_splitter, batch_size, params):
     model = GradientBoosting('mse', 'r2_score',
                              ntrees=params["n_trees"], lr=.01, verbose=20, es=200, lambda_l2=1,
                              subsample=.8, colsample=.8, min_data_in_leaf=10, min_gain_to_split=0,
-                             max_bin=256, max_depth=6, target_splitter=target_splitter)
+                             max_bin=256, max_depth=3, target_splitter=target_splitter)
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
 
     print("Testing orig prob...")
@@ -89,8 +89,8 @@ if __name__ == '__main__':
     params = {
         "x_size": 105000,
         "feat_size": 1,
-        "y_size": 3,
-        "n_trees": 2
+        "y_size": 2,
+        "n_trees": 1
     }
 
     with nvtx.annotate("Test case 1, OneVsAll"):
