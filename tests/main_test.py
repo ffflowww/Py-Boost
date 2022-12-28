@@ -79,11 +79,11 @@ def test_reg(target_splitter, batch_size, params):
     ps_orig = model.predict_staged_deprecated(X_test, iterations=stages)
     ps_new = model.predict_staged(X_test, iterations=stages)
 
-    print(ps_orig[0])
-    print(ps_new[0])
-    print("----")
-    print(ps_orig[2])
-    print(ps_new[2])
+    print(ps_orig[0][0])
+    print(ps_new[0][0])
+    print("!!!!!!!")
+    print(ps_orig[1][0])
+    print(ps_new[1][0])
 
     print("sum:")
     print((ps_orig - ps_new).sum())
