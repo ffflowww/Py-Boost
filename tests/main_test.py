@@ -43,12 +43,14 @@ def test_reg(target_splitter, batch_size, params):
     with nvtx.annotate("pred inference all"):
         yp_fast_all = inference.predict(X_test, batch_size=batch_size)
 
-    diff = yp_orig - yp_fast
-    diff2 = yp_orig - yp_fast_all
-    diff3 = yp_fast - yp_fast_all
+    diff = abs(yp_orig - y_test)
+    diff2 = abs(yp_fast - y_test)
+    diff3 = abs(yp_fast_all - y_test)
+    diff4 = abs(yp_fast_all - yp_fast)
     print(f"Outs diff: {diff.sum()}")
     print(f"Outs diff2: {diff2.sum()}")
     print(f"Outs diff3: {diff3.sum()}")
+    print(f"Outs diff fast vs all: {diff4.sum()}")
 
     plt.plot(yp_orig - y_test)
     plt.savefig('error_orig.png')
