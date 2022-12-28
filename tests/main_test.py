@@ -87,9 +87,9 @@ def test_reg(target_splitter, batch_size, params):
 
     for i in range(100):
         print("old")
-        print(ps_orig[5][i])
+        print(ps_orig[0][i])
         print("new")
-        print(ps_new[5][i])
+        print(ps_new[0][i])
         print("true")
         print(yp_fast[i])
 
