@@ -99,6 +99,14 @@ def test_reg(target_splitter, batch_size, params):
     print((fi_orig_s - fi_new_s).sum())
     print((fi_orig_g - fi_new_g).sum())
 
+    print("LEAVES")
+    l_orig = model.predict_leaves_deprecated(X_test, stages, batch_size=10000)
+    l_new = model.predict_leaves(X_test, stages, batch_size=10000)
+
+    print(l_orig[1])
+    print("@@@@@@@@@@")
+    print(l_new[1])
+
 
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
@@ -111,18 +119,18 @@ if __name__ == '__main__':
         "n_trees": 100
     }
 
-    # params = {
-    #     "x_size": 55000,
-    #     "feat_size": 20,
-    #     "y_size": 6,
-    #     "n_trees": 50
-    # }
+    params = {
+        "x_size": 55000,
+        "feat_size": 20,
+        "y_size": 6,
+        "n_trees": 50
+    }
 
-    # with nvtx.annotate("Test case 1, OneVsAll"):
-    #     test_reg("OneVsAll", batch_size=100000, params=params)
+    with nvtx.annotate("Test case 1, OneVsAll"):
+        test_reg("OneVsAll", batch_size=100000, params=params)
 
-    with nvtx.annotate("Test case 2, Single"):
-        test_reg("Single", batch_size=100000, params=params)
+    # with nvtx.annotate("Test case 2, Single"):
+    #     test_reg("Single", batch_size=100000, params=params)
 
     print("Finish tests")
 

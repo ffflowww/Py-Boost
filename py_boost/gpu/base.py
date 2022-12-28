@@ -320,9 +320,9 @@ class Ensemble:
                     self.models[n].predict_leaf(gpu_batch[nst][:real_batch_len], gpu_leaves[nst][j][:real_batch_len])
 
                 if k >= 2:
-                    cpu_leaves_full[i - 2 * batch_size: i - batch_size] = cpu_leaves[nst][:batch_size]
+                    cpu_leaves_full[:, i - 2 * batch_size: i - batch_size] = cpu_leaves[nst][:, :batch_size]
 
-                gpu_leaves[nst][:real_batch_len].get(out=cpu_leaves[nst][:real_batch_len])
+                gpu_leaves[nst][:, real_batch_len].get(out=cpu_leaves[nst][:, real_batch_len])
                 cpu_out_ready_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                 last_batch_size = real_batch_len
@@ -332,15 +332,15 @@ class Ensemble:
         if int(np.floor(X.shape[0] / batch_size)) == 0:  # only one stream was used
             with map_streams[last_n_stream] as stream:
                 stream.synchronize()
-                cpu_leaves_full[:last_batch_size] = cpu_leaves[last_n_stream][:last_batch_size]
+                cpu_leaves_full[:, last_batch_size] = cpu_leaves[last_n_stream][:, last_batch_size]
         else:
             with map_streams[1 - last_n_stream] as stream:
                 stream.synchronize()
-                cpu_leaves_full[X.shape[0] - batch_size - last_batch_size: X.shape[0] - last_batch_size] = \
-                    cpu_leaves[1 - last_n_stream][:batch_size]
+                cpu_leaves_full[:, X.shape[0] - batch_size - last_batch_size: X.shape[0] - last_batch_size] = \
+                    cpu_leaves[1 - last_n_stream][:, batch_size]
             with map_streams[last_n_stream] as stream:
                 stream.synchronize()
-                cpu_leaves_full[X.shape[0] - last_batch_size:] = cpu_leaves[last_n_stream][:last_batch_size]
+                cpu_leaves_full[:, X.shape[0] - last_batch_size:] = cpu_leaves[last_n_stream][:, last_batch_size]
 
         return cpu_leaves_full
 

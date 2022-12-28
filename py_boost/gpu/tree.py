@@ -4,7 +4,7 @@ import cupy as cp
 import numpy as np
 
 from .utils import apply_values, depthwise_grow_tree, get_tree_node, set_leaf_values, calc_node_values
-from .utils import tree_prediction_kernel
+from .utils import tree_prediction_kernel, tree_prediction_leaves_kernel
 
 
 class Tree:
@@ -190,8 +190,8 @@ class Tree:
         """
         return self.predict_from_nodes(self.predict_leaf_from_nodes(self.predict_node(X)))
 
-    def predict_leaf(self, X):
-        """Predict leaf indices from the feature matrix X
+    def predict_leaf_deprecated(self, X):
+        """(DEPRECATED) Predict leaf indices from the feature matrix X
 
         Args:
             X: cp.ndarray of features
@@ -200,6 +200,24 @@ class Tree:
             cp.ndarray of leaves
         """
         return self.predict_leaf_from_nodes(self.predict_node(X))
+
+    def predict_leaf(self, X, res):
+        """Predict leaf indices from the feature matrix X
+
+        Args:
+            X: cp.ndarray of features
+            res: cp.ndarray of leaves
+
+        Returns:
+
+        """
+
+        tree_prediction_leaves_kernel((X.shape[0],), (self.ngroups, 1), ((X,
+                                                                          self.new_format,
+                                                                          self.new_format_offsets,
+                                                                          X.shape[1],
+                                                                          self.ngroups,
+                                                                          res)))
 
     def predict(self, X, res):
         """Predict from the feature matrix X
@@ -211,6 +229,7 @@ class Tree:
         Returns:
 
         """
+
         def get_optimal_cuda_params(nrows, ngroups):
             assert ngroups <= 1024
             if ngroups >= 512:
