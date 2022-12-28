@@ -684,7 +684,7 @@ tree_prediction_kernel_alltogether = cp.RawKernel(
         long long i_v_b;
         for(; i_out < i_out_end; ++i_out) {
             i_r_b = i_out_offset + gr_out_indexes[i_out];
-            i_v_b = value_offset + gr_out_indexes[i_out]
+            i_v_b = value_offset + gr_out_indexes[i_out];
             atomicAdd(&res[i_r_b], values[i_v_b]);
         }
     }
