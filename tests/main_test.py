@@ -77,8 +77,8 @@ def test_reg(target_splitter, batch_size, params):
     stages = [5, 15, 20, 21, 44, 49]
     # stages = [49]
 
-    ps_orig = model.predict_staged_deprecated(X_test, iterations=stages, batch_size=10000)
-    ps_new = model.predict_staged(X_test, iterations=stages, batch_size=10000)
+    ps_orig = model.predict_staged_deprecated(X_test, iterations=stages, batch_size=100_000)
+    ps_new = model.predict_staged(X_test, iterations=stages, batch_size=100_000)
 
     # for i in range(len(stages)):
     #     print(ps_orig[i][1])
@@ -91,23 +91,24 @@ def test_reg(target_splitter, batch_size, params):
     print(ps_orig.shape)
     print(ps_new.shape)
 
+
 if __name__ == '__main__':
     print(f"Start tests with cuda: {cp.cuda.runtime.runtimeGetVersion()}")
     print(os.environ['CONDA_DEFAULT_ENV'])
 
-    # params = {
-    #     "x_size": 1050000,
-    #     "feat_size": 50,
-    #     "y_size": 16,
-    #     "n_trees": 100
-    # }
-
     params = {
-        "x_size": 55000,
-        "feat_size": 20,
-        "y_size": 6,
-        "n_trees": 50
+        "x_size": 1050000,
+        "feat_size": 50,
+        "y_size": 16,
+        "n_trees": 100
     }
+
+    # params = {
+    #     "x_size": 55000,
+    #     "feat_size": 20,
+    #     "y_size": 6,
+    #     "n_trees": 50
+    # }
 
     with nvtx.annotate("Test case 1, OneVsAll"):
         test_reg("OneVsAll", batch_size=100000, params=params)
