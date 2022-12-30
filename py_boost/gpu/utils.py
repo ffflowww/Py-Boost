@@ -602,10 +602,10 @@ tree_prediction_kernel_old_format = cp.RawKernel(
         
         float* res)
     {
-        long long i_ = blockIdx.x * blockDim.y + threadIdx.y;
+        int i_ = blockIdx.x * blockDim.y + threadIdx.y;
         int j_ = threadIdx.x;
 
-        long long x_feat_offset = n_features * i_;
+        int x_feat_offset = n_features * i_;
 
         int node = 0;
         int f;
@@ -613,7 +613,7 @@ tree_prediction_kernel_old_format = cp.RawKernel(
         int right;
         int x_ptr;
 
-        x_ptr = j_ + node;
+        x_ptr = j_;
         f = feats[x_ptr];
         
         // going through the tree
