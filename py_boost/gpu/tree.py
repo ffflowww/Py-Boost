@@ -252,7 +252,7 @@ class Tree:
         # print(type(self.group_index.dtype))
         # print(type(self.leaves.dtype))
         # print(type(self.values.dtype))
-        # # print(type(X.shape[1]))
+        print(X.shape[1])
         # # print(type(self.ngroups))
         # # print(type(self.nout))
         # print(type(res.dtype))
