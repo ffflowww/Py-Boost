@@ -627,6 +627,7 @@ tree_prediction_kernel_old_format = cp.RawKernel(
             node = splits[2 * x_ptr + right];
             x_ptr = j_ + node;
             f = feats[x_ptr];
+            f = -1;
         }
         
         //int res_offset = n_out * leaves[node * n_groups + j_];
