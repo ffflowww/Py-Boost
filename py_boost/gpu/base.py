@@ -343,7 +343,7 @@ class Ensemble:
                 stream.synchronize()
                 cpu_leaves_full[X.shape[0] - last_batch_size:] = cpu_leaves[last_n_stream][:last_batch_size]
 
-        return cpu_leaves_full
+        return np.transpose(cpu_leaves_full, (1, 0, 2))
 
     def get_feature_importance(self, imp_type='split'):
         """Get feature importance
