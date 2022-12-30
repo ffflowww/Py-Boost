@@ -106,6 +106,7 @@ class Ensemble:
         Returns:
             prediction, 2d np.ndarray of float32, shape (n_data, n_outputs)
         """
+
         self.to_device()
         prediction = pinned_array(np.empty((X.shape[0], self.base_score.shape[0]), dtype=np.float32))
 

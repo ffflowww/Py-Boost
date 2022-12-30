@@ -127,6 +127,12 @@ class Tree:
         Returns:
 
         """
+        if self._debug:
+            for attr in ['values', 'new_format', 'new_format_offsets', 'new_out_indexes', 'new_out_sizes']:
+                arr = getattr(self, attr)
+                setattr(self, attr, cp.asarray(arr))
+            return
+
         for attr in ['gains', 'feats', 'bin_splits', 'nans', 'split', 'val_splits', 'values', 'group_index', 'leaves',
                      'new_format', 'new_format_offsets', 'new_out_indexes', 'new_out_sizes']:
             arr = getattr(self, attr)
@@ -138,6 +144,12 @@ class Tree:
         Returns:
 
         """
+        if self._debug:
+            for attr in ['values', 'new_format', 'new_format_offsets', 'new_out_indexes', 'new_out_sizes']:
+                arr = getattr(self, attr)
+                setattr(self, attr, cp.asarray(arr))
+            return
+
         for attr in ['gains', 'feats', 'bin_splits', 'nans', 'split', 'val_splits', 'values', 'group_index', 'leaves',
                      'new_format', 'new_format_offsets', 'new_out_indexes', 'new_out_sizes']:
             arr = getattr(self, attr)
@@ -188,6 +200,9 @@ class Tree:
         Returns:
             cp.ndarray of predictions
         """
+        if self._debug:
+            print("Deprecated function aren't available in debug mode (!)")
+            return
         return self._predict_from_nodes_deprecated(self.predict_leaf_from_nodes(self._predict_node_deprecated(X)))
 
     def _predict_leaf_deprecated(self, X):
@@ -199,6 +214,9 @@ class Tree:
         Returns:
             cp.ndarray of leaves
         """
+        if self._debug:
+            print("Deprecated function aren't available in debug mode (!)")
+            return
         return self.predict_leaf_from_nodes(self._predict_node_deprecated(X))
 
     def predict_leaf(self, X, res, stage, stages_len):
@@ -257,6 +275,7 @@ class Tree:
                                                   res)))
 
     def reformat(self, debug=False):
+        self._debug = debug
         """Creates new internal format of the tree for faster inference
 
         Returns:
