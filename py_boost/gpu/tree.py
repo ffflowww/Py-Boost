@@ -249,12 +249,12 @@ class Tree:
         # print(type(self.val_splits.dtype))
         # print(type(self.split.dtype))
         # print(type(self.nans.dtype))
-        print(self.group_index)
-        # print(type(self.leaves.dtype))
-        # print(type(self.values.dtype))
-        # print(X.shape[1])
-        # # print(type(self.ngroups))
-        # # print(type(self.nout))
+        # print(self.group_index)
+        print(self.leaves.shape)
+        print(self.values.shape)
+        print(X.shape[1])
+        print(self.ngroups)
+        print(self.nout)
         # print(type(res.dtype))
 
         tree_prediction_kernel_old_format(blocks, threads, ((X,
