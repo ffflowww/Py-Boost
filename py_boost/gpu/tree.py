@@ -256,7 +256,7 @@ class Tree:
                                                   self.nout,
                                                   res)))
 
-    def reformat(self):
+    def reformat(self, debug=False):
         """Creates new internal format of the tree for faster inference
 
         Returns:
@@ -320,6 +320,10 @@ class Tree:
 
         self.new_out_sizes = np.array(ns, dtype=np.int32)
         self.new_out_indexes = np.array(ni, dtype=np.int32)
+
+        if debug is True:
+            for attr in ['gains', 'feats', 'bin_splits', 'nans', 'split', 'val_splits', 'group_index', 'leaves']:
+                delattr(self, attr)
 
 
 class DepthwiseTreeBuilder:
@@ -458,6 +462,6 @@ class DepthwiseTreeBuilder:
         val_preds = [apply_values(x, group_index, values) for x in val_leaves]
         tree.set_node_values(values.get(), group_index.get())
 
-        tree.reformat()
+        tree.reformat(debug=self.params['debug'])
 
         return tree, leaves, pred, val_leaves, val_preds

@@ -20,10 +20,10 @@ def test_reg(target_splitter, batch_size, params):
 
     print("Testing orig prob...")
     with nvtx.annotate("pred orig prob"):
-        model.predict_deprecated(X_test[:32*32], batch_size=batch_size)
+        model._predict_deprecated(X_test[:32*32], batch_size=batch_size)
     print("Testing orig...")
     with nvtx.annotate("pred orig"):
-        yp_orig = model.predict_deprecated(X_test, batch_size=batch_size)
+        yp_orig = model._predict_deprecated(X_test, batch_size=batch_size)
 
     print("Testing fast prob...")
     with nvtx.annotate("pred fast prob"):
@@ -77,7 +77,7 @@ def test_reg(target_splitter, batch_size, params):
 
     print("Test staging")
     stages = [5, 15, 20, 61, 99]
-    ps_orig = model.predict_staged_deprecated(X_test, iterations=stages, batch_size=100_000)
+    ps_orig = model._predict_staged_deprecated(X_test, iterations=stages, batch_size=100_000)
     ps_new = model.predict_staged(X_test, iterations=stages, batch_size=100_000)
 
     print("Difference between regular predict and staged predict (should be zero):")
@@ -90,8 +90,8 @@ def test_reg(target_splitter, batch_size, params):
 
 
     print("Test feature importance")
-    fi_orig_g = model.get_feature_importance_deprecated('gain')
-    fi_orig_s = model.get_feature_importance_deprecated('split')
+    fi_orig_g = model._get_feature_importance_deprecated('gain')
+    fi_orig_s = model._get_feature_importance_deprecated('split')
     fi_new_g = model.get_feature_importance('gain')
     fi_new_s = model.get_feature_importance('split')
     print("FI diff between old and new, should be zero")
@@ -99,7 +99,7 @@ def test_reg(target_splitter, batch_size, params):
     print((fi_orig_g - fi_new_g).sum())
 
     print("Test leaves predict")
-    l_orig = model.predict_leaves_deprecated(X_test, stages, batch_size=10000)
+    l_orig = model._predict_leaves_deprecated(X_test, stages, batch_size=10000)
     l_new = model.predict_leaves(X_test, stages, batch_size=10000)
     l_orig_t = np.transpose(l_orig, (1, 0, 2))
 
@@ -115,6 +115,8 @@ def test_reg(target_splitter, batch_size, params):
     print(l_new[500_000])
     print("Shapes, (old, new)")
     print(l_orig.shape, l_new.shape)
+    d = (l_orig_t - l_new).sum()
+    print(f"Diff: {d}")
 
 
 if __name__ == '__main__':
