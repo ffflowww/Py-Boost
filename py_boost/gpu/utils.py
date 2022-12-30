@@ -624,9 +624,9 @@ tree_prediction_kernel_old_format = cp.RawKernel(
             } else {
                 right = (int) (x > val_splits[x_ptr]);
             }
-            node = splits[2 * x_ptr + right];
-            x_ptr = j_ + node;
-            f = feats[x_ptr];
+            //node = splits[2 * x_ptr + right];
+            //x_ptr = j_ + node;
+            //f = feats[x_ptr];
             f = -1;
         }
         
