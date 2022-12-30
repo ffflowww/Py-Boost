@@ -614,7 +614,7 @@ tree_prediction_kernel_old_format = cp.RawKernel(
         int right;
         int x_ptr;
 
-        x_ptr = j_;
+        x_ptr = j_ * max_nodes;
         f = feats[x_ptr];
         
         // going through the tree
