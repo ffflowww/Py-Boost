@@ -255,6 +255,8 @@ class Tree:
         print(X.shape[1])
         print(self.ngroups)
         print(self.nout)
+        print(self.max_leaves)
+        print(self.max_nodes)
         # print(type(res.dtype))
 
         tree_prediction_kernel_old_format(blocks, threads, ((X,
