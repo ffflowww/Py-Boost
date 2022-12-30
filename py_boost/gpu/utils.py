@@ -593,7 +593,7 @@ tree_prediction_kernel_old_format = cp.RawKernel(
         const float* val_splits,
         const int* splits,
         const bool* nan_left,
-        const int* out_indexes,
+        const unsigned long long* out_indexes,
         const int* leaves,
         const float* values,
         const int n_features,
