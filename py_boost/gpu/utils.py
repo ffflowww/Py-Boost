@@ -633,9 +633,9 @@ tree_prediction_kernel_old_format = cp.RawKernel(
         int val_offset = n_out * leaves[node * n_groups + j_];
         for(int out_i = 0; out_i < n_out; ++out_i) {
             if (out_indexes[out_i] == j_) {
-                res[res_offset + out_i] = values[val_offset + out_i];
+                res[res_offset + out_i] += values[val_offset + out_i];
             }
-        }
+        }ы
     }
     ''',
     'tree_prediction_kernel_old_format')
