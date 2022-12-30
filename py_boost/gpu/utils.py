@@ -618,24 +618,23 @@ tree_prediction_kernel_old_format = cp.RawKernel(
         
         // going through the tree
         while (f >= 0) {    
-            //x = X[x_feat_offset + f];
-            //if (isnan(x)) {
-            //    right = 1 - (int) nan_left[x_ptr];
-            //} else {
-            //    right = (int) (x > val_splits[x_ptr]);
-            //}
-            //node = splits[2 * x_ptr + right];
-            //x_ptr = j_ + node;
-            //f = feats[x_ptr];
-            f = -1;
+            x = X[x_feat_offset + f];
+            if (isnan(x)) {
+                right = 1 - (int) nan_left[x_ptr];
+            } else {
+                right = (int) (x > val_splits[x_ptr]);
+            }
+            node = splits[2 * x_ptr + right];
+            x_ptr = j_ + node;
+            f = feats[x_ptr];
         }
         
-        //int res_offset = n_out * leaves[node * n_groups + j_];
-        //for(int out_i = 0; out_i < n_out; ++out_i) {
-        //    if (out_indexes[out_i] == j_) {
-        //        res[out_i] = values[res_offset + out_i];
-        //    }
-        //}
+        int res_offset = n_out * leaves[node * n_groups + j_];
+        for(int out_i = 0; out_i < n_out; ++out_i) {
+            if (out_indexes[out_i] == j_) {
+                res[out_i] = values[res_offset + out_i];
+            }
+        }
     }
     ''',
     'tree_prediction_kernel_old_format')

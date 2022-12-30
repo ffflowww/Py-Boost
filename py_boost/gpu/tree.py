@@ -4,7 +4,7 @@ import cupy as cp
 import numpy as np
 
 from .utils import apply_values, depthwise_grow_tree, get_tree_node, set_leaf_values, calc_node_values
-from .utils import tree_prediction_kernel, tree_prediction_leaves_kernel
+from .utils import tree_prediction_kernel, tree_prediction_leaves_kernel, tree_prediction_kernel_old_format
 
 
 class Tree:
@@ -252,12 +252,12 @@ class Tree:
         # print(type(self.group_index.dtype))
         # print(type(self.leaves.dtype))
         # print(type(self.values.dtype))
-        print(X.shape[1])
+        # print(X.shape[1])
         # # print(type(self.ngroups))
         # # print(type(self.nout))
         # print(type(res.dtype))
 
-        tree_prediction_kernel(blocks, threads, ((X,
+        tree_prediction_kernel_old_format(blocks, threads, ((X,
                                                   self.feats,
                                                   self.val_splits,
                                                   self.split,
