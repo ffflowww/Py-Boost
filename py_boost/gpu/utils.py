@@ -599,6 +599,7 @@ tree_prediction_kernel_old_format = cp.RawKernel(
         const int n_features,
         const int n_groups,
         const int n_out,
+        const int max_nodes,
         
         float* res)
     {
@@ -625,7 +626,7 @@ tree_prediction_kernel_old_format = cp.RawKernel(
                 right = (int) (x > val_splits[x_ptr]);
             }
             node = splits[2 * x_ptr + right];
-            x_ptr = j_ + node;
+            x_ptr = j_ * max_nodes + node;
             f = feats[x_ptr];
         }
         

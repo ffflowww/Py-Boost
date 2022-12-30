@@ -270,6 +270,7 @@ class Tree:
                                                   X.shape[1],
                                                   self.ngroups,
                                                   self.nout,
+                                                  self.max_nodes,
                                                   res)))
 
     def predict(self, X, res):
