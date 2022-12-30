@@ -245,7 +245,7 @@ class Tree:
                 return (nrows,), (ngroups, 1)
 
         blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
-        # print(type(self.feats.dtype))
+        print(self.feats.shape)
         # print(type(self.val_splits.dtype))
         # print(type(self.split.dtype))
         # print(type(self.nans.dtype))
