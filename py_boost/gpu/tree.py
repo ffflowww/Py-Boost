@@ -245,17 +245,17 @@ class Tree:
                 return (nrows,), (ngroups, 1)
 
         blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
-        print(type(self.feats))
-        print(type(self.val_splits))
-        print(type(self.split))
-        print(type(self.nans))
-        print(type(self.group_index))
-        print(type(self.leaves))
-        print(type(self.values))
-        print(type(X.shape[1]))
-        print(type(self.ngroups))
-        print(type(self.nout))
-        print(type(res))
+        print(type(self.feats.dtype))
+        print(type(self.val_splits.dtype))
+        print(type(self.split.dtype))
+        print(type(self.nans.dtype))
+        print(type(self.group_index.dtype))
+        print(type(self.leaves.dtype))
+        print(type(self.values.dtype))
+        # print(type(X.shape[1]))
+        # print(type(self.ngroups))
+        # print(type(self.nout))
+        print(type(res.dtype))
 
         tree_prediction_kernel(blocks, threads, ((X,
                                                   self.feats,
