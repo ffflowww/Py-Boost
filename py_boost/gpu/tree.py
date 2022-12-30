@@ -144,8 +144,8 @@ class Tree:
             if type(arr) is not np.ndarray:
                 setattr(self, attr, arr.get())
 
-    def predict_node(self, X):
-        """Predict node id from the feature matrix X
+    def _predict_node_deprecated(self, X):
+        """(DEPRECATED) Predict node id from the feature matrix X
 
         Args:
             X: cp.ndarray of features
@@ -157,8 +157,8 @@ class Tree:
         nodes = get_tree_node(X, self.feats, self.val_splits, self.split, self.nans)
         return nodes
 
-    def predict_from_nodes(self, nodes):
-        """Predict outputs from the nodes indices
+    def _predict_from_nodes_deprecated(self, nodes):
+        """(DEPRECATED) Predict outputs from the nodes indices
 
         Args:
             nodes: cp.ndarray of predicted nodes
@@ -179,7 +179,7 @@ class Tree:
         """
         return apply_values(nodes, cp.arange(self.ngroups, dtype=cp.uint64), self.leaves)
 
-    def predict_deprecated(self, X):
+    def _predict_deprecated(self, X):
         """(DEPRECATED) Predict from the feature matrix X
 
         Args:
@@ -188,9 +188,9 @@ class Tree:
         Returns:
             cp.ndarray of predictions
         """
-        return self.predict_from_nodes(self.predict_leaf_from_nodes(self.predict_node(X)))
+        return self._predict_from_nodes_deprecated(self.predict_leaf_from_nodes(self._predict_node_deprecated(X)))
 
-    def predict_leaf_deprecated(self, X):
+    def _predict_leaf_deprecated(self, X):
         """(DEPRECATED) Predict leaf indices from the feature matrix X
 
         Args:
@@ -199,7 +199,7 @@ class Tree:
         Returns:
             cp.ndarray of leaves
         """
-        return self.predict_leaf_from_nodes(self.predict_node(X))
+        return self.predict_leaf_from_nodes(self._predict_node_deprecated(X))
 
     def predict_leaf(self, X, res, stage, stages_len):
         """Predict leaf indices from the feature matrix X

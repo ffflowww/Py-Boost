@@ -11,6 +11,7 @@ if not _root_logger.hasHandlers():
     _logger.propagate = False
 
 from .gpu.boosting import GradientBoosting
+from .gpu.inference import EnsembleInference
 from .gpu.sketch_boost import SketchBoost
 from .utils.tl_wrapper import TLPredictor, TLCompiledPredictor
 from .callbacks.callback import Callback
@@ -20,6 +21,7 @@ from .gpu.losses.metrics import Metric
 __all__ = [
 
     'GradientBoosting',
+    'EnsembleInference',
     'SketchBoost',
     'TLPredictor',
     'TLCompiledPredictor',
@@ -34,9 +36,9 @@ __all__ = [
 
 ]
 
-# try:
-#     import importlib.metadata as importlib_metadata
-# except ModuleNotFoundError:
-#     import importlib_metadata
-#
-# __version__ = importlib_metadata.version(__name__)
+try:
+    import importlib.metadata as importlib_metadata
+except ModuleNotFoundError:
+    import importlib_metadata
+
+__version__ = importlib_metadata.version(__name__)
