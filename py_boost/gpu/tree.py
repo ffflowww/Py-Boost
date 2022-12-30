@@ -221,6 +221,44 @@ class Tree:
                                                                           stage,
                                                                           res)))
 
+    def predict_old_format(self, X, res):
+        """Predict from the feature matrix X
+
+        Args:
+            X: cp.ndarray of features
+            res: cp.ndarray buffer for predictions
+
+        Returns:
+
+        """
+
+        def get_optimal_cuda_params(nrows, ngroups):
+            assert ngroups <= 1024
+            if ngroups >= 512:
+                return (nrows,), (ngroups, 1)
+            nr = 512 // ngroups
+            if nrows > nr:
+                while nrows % nr > 0:
+                    nr = nr // 2
+                return (nrows // nr,), (ngroups, nr)
+            else:
+                return (nrows,), (ngroups, 1)
+
+        blocks, threads = get_optimal_cuda_params(X.shape[0], self.ngroups)
+
+        tree_prediction_kernel(blocks, threads, ((X,
+                                                  self.feats,
+                                                  self.val_splits,
+                                                  self.split,
+                                                  self.nans,
+                                                  self.group_index,
+                                                  self.leaves,
+                                                  self.values,
+                                                  X.shape[1],
+                                                  self.ngroups,
+                                                  self.nout,
+                                                  res)))
+
     def predict(self, X, res):
         """Predict from the feature matrix X
 

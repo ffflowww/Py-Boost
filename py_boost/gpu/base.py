@@ -421,7 +421,7 @@ class Ensemble:
 
         return cpu_pred_full
 
-    def predict(self, X, batch_size=100000):
+    def predict(self, X, batch_size=100000, old=False):
         """Make prediction for the feature matrix X
 
         Args:
@@ -468,7 +468,10 @@ class Ensemble:
                 gpu_pred[nst][:] = self.base_score
 
                 for tree in self.models:
-                    tree.predict(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+                    if old:
+                        tree.predict_old_format(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+                    else:
+                        tree.predict(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                 if k >= 2:
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]

@@ -20,10 +20,10 @@ def test_reg(target_splitter, batch_size, params):
 
     print("Testing orig prob...")
     with nvtx.annotate("pred orig prob"):
-        model.predict_deprecated(X_test[:32*32], batch_size=batch_size)
+        model._predict_deprecated(X_test[:32*32], batch_size=batch_size)
     print("Testing orig...")
     with nvtx.annotate("pred orig"):
-        yp_orig = model.predict_deprecated(X_test, batch_size=batch_size)
+        yp_orig = model._predict_deprecated(X_test, batch_size=batch_size)
 
     print("Testing fast prob...")
     with nvtx.annotate("pred fast prob"):
@@ -32,16 +32,18 @@ def test_reg(target_splitter, batch_size, params):
     with nvtx.annotate("pred fast"):
         yp_fast = model.predict(X_test, batch_size=batch_size)
 
-    print("Creating new Inference class")
-    with nvtx.annotate("new class creating"):
-        inference = EnsembleInference(model)
+    # print("Creating new Inference class")
+    # with nvtx.annotate("new class creating"):
+    #     inference = EnsembleInference(model)
 
     print("Testing Inference class prob...")
     with nvtx.annotate("pred Inference class prob"):
-        inference.predict(X_test[:32 * 32], batch_size=batch_size)
+        # inference.predict(X_test[:32 * 32], batch_size=batch_size)
+        model.predict(X_test[:32*32], batch_size=batch_size, old=True)
     print("Testing Inference class...")
     with nvtx.annotate("pred Inference class"):
-        yp_fast_all = inference.predict(X_test, batch_size=batch_size)
+        # yp_fast_all = inference.predict(X_test, batch_size=batch_size)
+        yp_fast_all = model.predict(X_test, batch_size=batch_size, old=True)
 
     diff = abs(yp_orig - y_test)
     diff2 = abs(yp_fast - y_test)
@@ -75,46 +77,46 @@ def test_reg(target_splitter, batch_size, params):
     plt.clf()
 
 
-    print("Test staging")
-    stages = [5, 15, 20, 61, 99]
-    ps_orig = model.predict_staged_deprecated(X_test, iterations=stages, batch_size=100_000)
-    ps_new = model.predict_staged(X_test, iterations=stages, batch_size=100_000)
-
-    print("Difference between regular predict and staged predict (should be zero):")
-    print("Old version:")
-    print((ps_orig[4] - yp_fast).sum())
-    print("New version:")
-    print((ps_new[4] - yp_fast).sum())
-    print("Shapes: (old, new)")
-    print(ps_orig.shape, ps_new.shape)
-
-
-    print("Test feature importance")
-    fi_orig_g = model.get_feature_importance_deprecated('gain')
-    fi_orig_s = model.get_feature_importance_deprecated('split')
-    fi_new_g = model.get_feature_importance('gain')
-    fi_new_s = model.get_feature_importance('split')
-    print("FI diff between old and new, should be zero")
-    print((fi_orig_s - fi_new_s).sum())
-    print((fi_orig_g - fi_new_g).sum())
-
-    print("Test leaves predict")
-    l_orig = model.predict_leaves_deprecated(X_test, stages, batch_size=10000)
-    l_new = model.predict_leaves(X_test, stages, batch_size=10000)
-    l_orig_t = np.transpose(l_orig, (1, 0, 2))
-
-    print("OLd and new, should be similar the first two for sure, the third could be different dur to old error")
-    print("@@@@@@@ 1")
-    print(l_orig_t[0])
-    print(l_new[0])
-    print("@@@@@@@ 2")
-    print(l_orig_t[77])
-    print(l_new[77])
-    print("@@@@@@@ 3")
-    print(l_orig_t[500_000])
-    print(l_new[500_000])
-    print("Shapes, (old, new)")
-    print(l_orig.shape, l_new.shape)
+    # print("Test staging")
+    # stages = [5, 15, 20, 61, 99]
+    # ps_orig = model.predict_staged_deprecated(X_test, iterations=stages, batch_size=100_000)
+    # ps_new = model.predict_staged(X_test, iterations=stages, batch_size=100_000)
+    #
+    # print("Difference between regular predict and staged predict (should be zero):")
+    # print("Old version:")
+    # print((ps_orig[4] - yp_fast).sum())
+    # print("New version:")
+    # print((ps_new[4] - yp_fast).sum())
+    # print("Shapes: (old, new)")
+    # print(ps_orig.shape, ps_new.shape)
+    #
+    #
+    # print("Test feature importance")
+    # fi_orig_g = model.get_feature_importance_deprecated('gain')
+    # fi_orig_s = model.get_feature_importance_deprecated('split')
+    # fi_new_g = model.get_feature_importance('gain')
+    # fi_new_s = model.get_feature_importance('split')
+    # print("FI diff between old and new, should be zero")
+    # print((fi_orig_s - fi_new_s).sum())
+    # print((fi_orig_g - fi_new_g).sum())
+    #
+    # print("Test leaves predict")
+    # l_orig = model.predict_leaves_deprecated(X_test, stages, batch_size=10000)
+    # l_new = model.predict_leaves(X_test, stages, batch_size=10000)
+    # l_orig_t = np.transpose(l_orig, (1, 0, 2))
+    #
+    # print("OLd and new, should be similar the first two for sure, the third could be different dur to old error")
+    # print("@@@@@@@ 1")
+    # print(l_orig_t[0])
+    # print(l_new[0])
+    # print("@@@@@@@ 2")
+    # print(l_orig_t[77])
+    # print(l_new[77])
+    # print("@@@@@@@ 3")
+    # print(l_orig_t[500_000])
+    # print(l_new[500_000])
+    # print("Shapes, (old, new)")
+    # print(l_orig.shape, l_new.shape)
 
 
 if __name__ == '__main__':
