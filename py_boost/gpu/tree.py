@@ -201,8 +201,7 @@ class Tree:
             cp.ndarray of predictions
         """
         if self._debug:
-            print("Deprecated function aren't available in debug mode (!)")
-            return
+            raise Exception("Deprecated functions aren't available in debug mode (!)")
         return self._predict_from_nodes_deprecated(self.predict_leaf_from_nodes(self._predict_node_deprecated(X)))
 
     def _predict_leaf_deprecated(self, X):
@@ -215,8 +214,7 @@ class Tree:
             cp.ndarray of leaves
         """
         if self._debug:
-            print("Deprecated function aren't available in debug mode (!)")
-            return
+            raise Exception("Deprecated functions aren't available in debug mode (!)")
         return self.predict_leaf_from_nodes(self._predict_node_deprecated(X))
 
     def predict_leaf(self, X, res, stage, stages_len):
