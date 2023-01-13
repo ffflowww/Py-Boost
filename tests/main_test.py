@@ -56,6 +56,7 @@ def test_reg(target_splitter, batch_size, params):
     print(f"Outs diff_1: {diff2.sum()}")
     print(f"Outs diff_2: {diff3.sum()}")
     print(f"Outs diff_Z: {diff4.sum()}")
+    print(f"Outs diff_Zwothorig: {(yp_orig - yp_fast).sum()}")
     # print(y_test[0])
     # print(yp_orig[0])
     # print(yp_fast[0])
