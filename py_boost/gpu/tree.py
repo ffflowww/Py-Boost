@@ -339,11 +339,8 @@ class Tree:
         self.new_out_indexes = np.array(ni, dtype=np.int32)
 
         if debug is True:
-            print("DEL TRUE")
             for attr in ['gains', 'feats', 'bin_splits', 'nans', 'split', 'val_splits', 'group_index', 'leaves']:
                 delattr(self, attr)
-        else:
-            print("DEL FALSE")
 
 
 class DepthwiseTreeBuilder:
