@@ -15,15 +15,16 @@ def test_reg(target_splitter, batch_size, params):
     model = GradientBoosting('mse', 'r2_score',
                              ntrees=params["n_trees"], lr=.01, verbose=20, es=200, lambda_l2=1,
                              subsample=.8, colsample=.8, min_data_in_leaf=10, min_gain_to_split=0,
-                             max_bin=256, max_depth=6, target_splitter=target_splitter, debug=True)
+                             max_bin=256, max_depth=6, target_splitter=target_splitter,
+                             debug=False)
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
 
-    # print("Testing orig prob...")
-    # with nvtx.annotate("pred orig prob"):
-    #     model._predict_deprecated(X_test[:32*32], batch_size=batch_size)
-    # print("Testing orig...")
-    # with nvtx.annotate("pred orig"):
-    #     yp_orig = model._predict_deprecated(X_test, batch_size=batch_size)
+    print("Testing orig prob...")
+    with nvtx.annotate("pred orig prob"):
+        model._predict_deprecated(X_test[:32*32], batch_size=batch_size)
+    print("Testing orig...")
+    with nvtx.annotate("pred orig"):
+        yp_orig = model._predict_deprecated(X_test, batch_size=batch_size)
 
     print("Testing fast prob...")
     with nvtx.annotate("pred fast prob"):
@@ -42,15 +43,15 @@ def test_reg(target_splitter, batch_size, params):
     print("Testing Inference class...")
     with nvtx.annotate("pred Inference class"):
         yp_fast_all = inference.predict(X_test, batch_size=batch_size)
-    #
-    # diff = abs(yp_orig - y_test)
-    # diff2 = abs(yp_fast - y_test)
-    # diff3 = abs(yp_fast_all - y_test)
-    # diff4 = abs(yp_fast_all - yp_fast)
-    # print(f"Outs diff_0: {diff.sum()}")
-    # print(f"Outs diff_1: {diff2.sum()}")
-    # print(f"Outs diff_2: {diff3.sum()}")
-    # print(f"Outs diff_Z: {diff4.sum()}")
+
+    diff = abs(yp_orig - y_test)
+    diff2 = abs(yp_fast - y_test)
+    diff3 = abs(yp_fast_all - y_test)
+    diff4 = abs(yp_fast_all - yp_fast)
+    print(f"Outs diff_0: {diff.sum()}")
+    print(f"Outs diff_1: {diff2.sum()}")
+    print(f"Outs diff_2: {diff3.sum()}")
+    print(f"Outs diff_Z: {diff4.sum()}")
     # print(y_test[0])
     # print(yp_orig[0])
     # print(yp_fast[0])

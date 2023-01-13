@@ -6,13 +6,11 @@ import treelite
 import treelite_runtime as tl_run
 
 
-def create_node(tree, node_id):
-    """Create a node of treelite tree
-
+def _create_node_deprecated(tree, node_id):
+    """(DEPRECATED) Create a node of treelite tree
     Args:
         tree: Py-Boost Tree, tree to parse
         node_id: int, node index
-
     Returns:
         dict, args of treelite.ModelBuilder.Tree .set_numerical_test_node or .set_leaf_node
     """
@@ -33,6 +31,42 @@ def create_node(tree, node_id):
         return node, left, right
 
     return {'value': tree.values[tree.leaves[node_id][0]]}, None, None
+
+
+def create_node(tree, node_id):
+    """Create a node of treelite tree
+
+    Args:
+        tree: Py-Boost Tree, tree to parse
+        node_id: int, node index
+
+    Returns:
+        dict, args of treelite.ModelBuilder.Tree .set_numerical_test_node or .set_leaf_node
+    """
+    if node_id == 0:
+        node_id = 1
+
+    if node_id > 0:  # it's a node
+        node_id -= 1
+
+        feature_id = int(tree.new_format[node_id * 4])
+        nan_left = feature_id > 0
+        feature_id = abs(feature_id) - 1
+
+        left = int(tree.new_format[node_id * 4 + 2])
+        right = int(tree.new_format[node_id * 4 + 3])
+        node = {
+            'feature_id': feature_id,
+            'opname': '<=',
+            'threshold': tree.new_format[node_id * 4 + 1],
+            'default_left': nan_left,
+            'left_child_key': left,
+            'right_child_key': right,
+        }
+
+        return node, left, right
+    else:  # it's a list
+        return {'value': tree.values[abs(node_id) - 1]}, None, None
 
 
 def parse_pb_tree(tree):
