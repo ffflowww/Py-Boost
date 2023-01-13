@@ -19,7 +19,8 @@ def test_reg(target_splitter, batch_size, params):
                              debug=False)
     model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
 
-    X_test.ravel()[np.random.choice(X_test.size, X_test.size // 10, replace=False)] = np.nan
+    # X_test.ravel()[np.random.choice(X_test.size, X_test.size // 10, replace=False)] = np.nan
+    X_test[...] = np.nan
 
     print("Testing orig prob...")
     with nvtx.annotate("pred orig prob"):
