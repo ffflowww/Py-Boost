@@ -21,6 +21,7 @@ def test_reg(target_splitter, batch_size, params):
 
     # X_test.ravel()[np.random.choice(X_test.size, X_test.size // 10, replace=False)] = np.nan
     X_test[...] = np.nan
+    print(X_test)
 
     print("Testing orig prob...")
     with nvtx.annotate("pred orig prob"):
