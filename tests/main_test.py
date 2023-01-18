@@ -19,9 +19,10 @@ def test_reg(target_splitter, batch_size, params):
     #                          debug=False)
     # model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
 
-    # X_test.ravel()[np.random.choice(X_test.size, X_test.size // 10, replace=False)] = np.nan
     print(X_test)
-    X[np.random.rand(150000, 100) > 0.5] = np.nan
+    # X_test.ravel()[np.random.choice(X_test.size, X_test.size // 10, replace=False)] = np.nan
+
+    X_test[np.random.rand(X_test.shape[0], X_test.shape[1]) > 0.5] = np.nan
     # X_test[...] = np.nan
     print(X_test)
 
