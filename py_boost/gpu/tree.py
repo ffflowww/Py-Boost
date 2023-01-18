@@ -298,6 +298,9 @@ class Tree:
         nf = np.zeros(total_size * 4, dtype=np.float32)
 
         # reformatting the tree
+        print(type(self.nans))
+        print(self.nans)
+
         for i in range(n_gr):
             q = [(0, 0)]
             while len(q) != 0:  # BFS
