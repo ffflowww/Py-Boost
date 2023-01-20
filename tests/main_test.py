@@ -20,7 +20,7 @@ def test_reg(target_splitter, batch_size, params):
                              subsample=.8, colsample=.8, min_data_in_leaf=10, min_gain_to_split=0,
                              max_bin=256, max_depth=6, target_splitter=target_splitter,
                              debug=False)
-    model.fit(X, y, eval_sets=[{'X': X_test, 'y': y_test},])
+    model.fit(X_train, y_train, eval_sets=[{'X': X_test, 'y': y_test},])
 
     # print(X_test)
     # X_test.ravel()[np.random.choice(X_test.size, X_test.size // 10, replace=False)] = np.nan
