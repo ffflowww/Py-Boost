@@ -332,7 +332,8 @@ class Tree:
         print(nf)
         print("???")
         print("AFTER!!!")
-        print(cp.array(nf, dtype=cp.float32).get())
+        c = cp.array(nf, dtype=cp.float32)
+        print(c.get())
         print(nf)
         print("???")
 
