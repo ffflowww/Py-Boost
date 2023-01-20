@@ -126,11 +126,14 @@ class Ensemble:
                 result[:] = self.base_score
                 for n, tree in enumerate(self.models):
                     result += tree._predict_deprecated(gpu_batch)
+                    st.synchronize()  # TODO: FOR DEBUG(!) ONLY REMOVE!
 
                 self.postprocess_fn(result).get(stream=st, out=prediction[i: i + x_batch.shape[0]])
 
                 stop_event = st.record()
                 stop_events.append(stop_event)
+
+                st.synchronize()  # TODO: FOR DEBUG(!) ONLY REMOVE!
 
         curr_stream = cp.cuda.get_current_stream()
         for stop_event in stop_events:
