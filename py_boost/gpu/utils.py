@@ -660,7 +660,7 @@ tree_prediction_kernel = cp.RawKernel(
             x = X[x_feat_offset + abs(n_feat_raw) - 1];
 
             if (isnan(x)) {
-                n_node = (n_feat_raw > 0) ? (int)nd.w : (int)nd.z;
+                n_node = (nd.x > 0.0) ? (int)nd.w : (int)nd.z;
             } else {
                 n_node = (x > nd.y) ? (int)nd.w : (int)nd.z;
             }
