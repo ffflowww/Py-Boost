@@ -12,7 +12,7 @@ from py_boost.gpu.inference import EnsembleInference
 def test_reg(target_splitter, batch_size, params):
     X, y = make_regression(params["x_size"], params["feat_size"], n_targets=params["y_size"], random_state=42)
 
-    # X[np.random.rand(X.shape[0], X.shape[1]) > 0.5] = np.nan
+    X[np.random.rand(X.shape[0], X.shape[1]) > 0.8] = np.nan
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.95, random_state=42)
     model = GradientBoosting('mse', 'r2_score',
@@ -22,8 +22,8 @@ def test_reg(target_splitter, batch_size, params):
                              debug=False)
     model.fit(X_train, y_train, eval_sets=[{'X': X_test, 'y': y_test},])
 
-    print(X_train)
-    print(X_test)
+    # print(X_train)
+    # print(X_test)
     # X_test.ravel()[np.random.choice(X_test.size, X_test.size // 10, replace=False)] = np.nan
 
     # X_test[np.random.rand(X_test.shape[0], X_test.shape[1]) > 0.5] = np.nan
@@ -65,7 +65,7 @@ def test_reg(target_splitter, batch_size, params):
     print(f"Outs diff_1: {diff2.sum()}")
     print(f"Outs diff_2: {diff3.sum()}")
     print(f"Outs diff_Z: {diff4.sum()}")
-    print(f"Outs diff_Zwothorig: {(yp_orig - yp_fast).sum()}")
+    print(f"Outs diff_Y: {(yp_orig - yp_fast).sum()}")
     # print(y_test[0])
     # print(yp_orig[0])
     # print(yp_fast[0])
