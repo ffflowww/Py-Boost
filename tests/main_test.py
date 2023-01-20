@@ -87,6 +87,9 @@ def test_reg(target_splitter, batch_size, params):
     plt.plot(yp_fast_all - yp_fast)
     plt.savefig('error_fast_vs_all.png')
     plt.clf()
+    plt.plot(yp_orig - yp_fast)
+    plt.savefig('error_orig_vs_fast.png')
+    plt.clf()
     #
     #
     # print("Test staging")
