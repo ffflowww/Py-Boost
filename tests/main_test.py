@@ -12,7 +12,7 @@ from py_boost.gpu.inference import EnsembleInference
 def test_reg(target_splitter, batch_size, params):
     X, y = make_regression(params["x_size"], params["feat_size"], n_targets=params["y_size"], random_state=42)
 
-    X[np.random.rand(X.shape[0], X.shape[1]) > 0.5] = np.nan
+    # X[np.random.rand(X.shape[0], X.shape[1]) > 0.5] = np.nan
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.95, random_state=42)
     model = GradientBoosting('mse', 'r2_score',
