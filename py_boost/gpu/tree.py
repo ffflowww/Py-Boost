@@ -327,6 +327,7 @@ class Tree:
 
         self.new_format = nf
         self.new_format_offsets = gr_subtree_offsets
+        print(nf)
 
         # new arrays for output indexing
         ns = [0]
