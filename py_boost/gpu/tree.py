@@ -334,7 +334,7 @@ class Tree:
         print("AFTER!!!")
         c = cp.array(nf, dtype=cp.float32)
         print(c.get())
-        print(nf)
+        # print(nf)
         print("???")
 
         # new arrays for output indexing
