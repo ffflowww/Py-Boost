@@ -327,26 +327,6 @@ class Tree:
 
         self.new_format = nf
         self.new_format_offsets = gr_subtree_offsets
-        # print("BEFORE!!!")
-        # print(nf.shape)
-        # print(nf)
-        # print("???")
-        # print("NANS")
-        # print(self.nans.shape)
-        # print(type(self.nans))
-        # print(type(self.nans[0]))
-        # print(type(self.nans[0][0]))
-        # print(self.nans)
-        # print("end")
-        # print("feats")
-        # print(self.feats.shape)
-        # print(self.feats)
-        # print("end")
-        # # print("AFTER!!!")
-        # # c = cp.array(nf, dtype=cp.float32)
-        # # print(c.get())
-        # # # print(nf)
-        # # print("???")
 
         # new arrays for output indexing
         ns = [0]
