@@ -622,7 +622,7 @@ tree_prediction_leaves_kernel = cp.RawKernel(
         }
 
         // writing result
-        //res[i_ * n_out + stage * n_gr + j_] = (-n_node - 1);
+        res[i_ * n_out + stage * n_gr + j_] = (-n_node - 1);
     }
     ''',
     'tree_prediction_leaves_kernel')

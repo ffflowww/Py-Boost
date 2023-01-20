@@ -37,15 +37,24 @@ def test_reg(target_splitter, batch_size, params):
         model._predict_leaves_deprecated(X_test[:32 * 32], batch_size=batch_size)
     print("Testing leaves orig...")
     with nvtx.annotate("pred leaves orig"):
-        model._predict_leaves_deprecated(X_test, batch_size=batch_size)
+        lo = model._predict_leaves_deprecated(X_test, batch_size=batch_size)
 
     print("Testing leaves fast prob...")
     with nvtx.annotate("pred leaves fast prob"):
         model.predict_leaves(X_test[:32 * 32], batch_size=batch_size)
     print("Testing leaves fast...")
     with nvtx.annotate("pred leaves fast"):
-        model.predict_leaves(X_test, batch_size=batch_size)
+        lf = model.predict_leaves(X_test, batch_size=batch_size)
 
+    print("LLLL")
+    print(lo.shape)
+    print(lo)
+    print("--------------------")
+    print(lf.shape)
+    print(lf)
+    print("+++++++++++++++++++")
+    print((lo-lf).sum())
+    print("EEEE")
 
 
 
