@@ -238,6 +238,7 @@ class Tree:
                                                                           self.ngroups,
                                                                           stages_len * self.ngroups,
                                                                           stage,
+                                                                          X.shape[0],
                                                                           res)))
 
     def predict(self, X, res):
