@@ -256,17 +256,17 @@ class Tree:
 
         threads = 128
         blocks = ((X.shape[0] * self.ngroups) // threads) + 1
-        tree_prediction_leaves_kernel((blocks,), (threads,), ((X,
-                                                               self.new_format,
-                                                               self.new_format_offsets,
-                                                               self.values,
-                                                               self.new_out_sizes,
-                                                               self.new_out_indexes,
-                                                               X.shape[1],
-                                                               self.nout,
-                                                               X.shape[0],
-                                                               self.ngroups,
-                                                               res)))
+        tree_prediction_kernel((blocks,), (threads,), ((X,
+                                                        self.new_format,
+                                                        self.new_format_offsets,
+                                                        self.values,
+                                                        self.new_out_sizes,
+                                                        self.new_out_indexes,
+                                                        X.shape[1],
+                                                        self.nout,
+                                                        X.shape[0],
+                                                        self.ngroups,
+                                                        res)))
 
     def reformat(self, nfeats, debug=False):
         self._debug = debug
