@@ -10,13 +10,14 @@ if not _root_logger.hasHandlers():
     _logger.addHandler(logging.StreamHandler(sys.stdout))
     _logger.propagate = False
 
-# import torch
-# if torch.cuda.is_available():
-from .gpu.boosting import GradientBoosting
-from .gpu.sketch_boost import SketchBoost
-from .gpu.losses.losses import Loss
-from .gpu.losses.metrics import Metric
-from .gpu.inference import EnsembleInference
+import torch
+if torch.cuda.is_available():
+    from .gpu.boosting import GradientBoosting
+    from .gpu.sketch_boost import SketchBoost
+    from .gpu.losses.losses import Loss
+    from .gpu.losses.metrics import Metric
+    from .gpu.inference import EnsembleInference
+
 
 from .callbacks.callback import Callback
 from .utils.tl_wrapper import TLPredictor, TLCompiledPredictor
