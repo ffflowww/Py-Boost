@@ -232,7 +232,7 @@ class Tree:
         """
 
         # tree_prediction_leaves_kernel((X.shape[0],), (self.ngroups, 1), ((X,
-        tree_prediction_leaves_kernel((((X.shape[0] * self.ngroups) // 64) + 1,), (64,), ((X,
+        tree_prediction_leaves_kernel((((X.shape[0] * self.ngroups) // 128) + 1,), (128,), ((X,
                                                                           self.new_format,
                                                                           self.new_format_offsets,
                                                                           X.shape[1],
