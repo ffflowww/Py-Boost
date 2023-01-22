@@ -231,7 +231,8 @@ class Tree:
 
         """
 
-        tree_prediction_leaves_kernel((X.shape[0],), (self.ngroups, 1), ((X,
+        # tree_prediction_leaves_kernel((X.shape[0],), (self.ngroups, 1), ((X,
+        tree_prediction_leaves_kernel((((X.shape[0] * self.ngroups) // 256) + 1,), (256,), ((X,
                                                                           self.new_format,
                                                                           self.new_format_offsets,
                                                                           X.shape[1],
