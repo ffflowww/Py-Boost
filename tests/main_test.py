@@ -51,10 +51,10 @@ def test_reg(target_splitter, batch_size, params):
 
     print("LLLL")
     print(lo.shape)
-    print(lo)
+    # print(lo)
     print("--------------------")
     print(lf.shape)
-    print(lf)
+    # print(lf)
     print("+++++++++++++++++++")
     print((lo-lf).sum())
     print("EEEE")

@@ -297,7 +297,7 @@ class Ensemble:
                 self.models[n].predict_leaf(X, gpu_pred, j, len(iterations))
 
             gpu_pred.get(out=cpu_pred)
-            return cpu_pred
+            return np.transpose(cpu_pred, (1, 0, 2))
 
         # result allocation
         cpu_leaves_full = np.empty((X.shape[0], len(iterations), ngroups), dtype=np.int32)
