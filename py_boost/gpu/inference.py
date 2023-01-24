@@ -90,6 +90,11 @@ class EnsembleInference:
         blocks = sz // threads
         if sz % threads != 0:
             blocks += 1
+
+        print(self.n_models)
+        print(self.n_groups)
+        print(X.shape[0])
+        print(sz, blocks, threads)
         tree_prediction_kernel_alltogether((blocks, self.n_models), (threads,), ((X,
                                                                                   self.all_trees,
                                                                                   self.all_tree_offsets,
