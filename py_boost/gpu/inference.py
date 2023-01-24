@@ -91,10 +91,6 @@ class EnsembleInference:
         if sz % threads != 0:
             blocks += 1
 
-        print(self.n_models)
-        print(self.n_groups)
-        print(X.shape[0])
-        print(sz, blocks, threads)
         tree_prediction_kernel_alltogether((blocks, self.n_models), (threads,), ((X,
                                                                                   self.all_trees,
                                                                                   self.all_tree_offsets,
@@ -126,7 +122,7 @@ class EnsembleInference:
 
         # special case handle if X is already on device
         if type(X) is cp.ndarray:
-            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            print("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDSA")
             cpu_pred = np.empty((X.shape[0], self.n_out), dtype=cur_dtype)
             gpu_pred = cp.empty((X.shape[0], self.n_out), dtype=cur_dtype)
 

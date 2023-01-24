@@ -84,10 +84,12 @@ def test_reg(target_splitter, batch_size, params):
 
     print("Testing Inference class prob...")
     with nvtx.annotate("pred Inference class prob"):
-        inference.predict(X_test[:32 * 32], batch_size=batch_size)
+        # inference.predict(X_test[:32 * 32], batch_size=batch_size)
+        inference.predict(X_test_gpu[:32 * 32], batch_size=batch_size)
     print("Testing Inference class...")
     with nvtx.annotate("pred Inference class"):
-        yp_fast_all = inference.predict(X_test, batch_size=batch_size)
+        # yp_fast_all = inference.predict(X_test, batch_size=batch_size)
+        yp_fast_all = inference.predict(X_test_gpu, batch_size=batch_size)
 
     diff = abs(yp_orig - y_test)
     diff2 = abs(yp_fast - y_test)
