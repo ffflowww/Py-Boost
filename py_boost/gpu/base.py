@@ -296,6 +296,7 @@ class Ensemble:
             for j, n in enumerate(iterations):
                 self.models[n].predict_leaf(X, gpu_pred, j, len(iterations))
 
+            cp.cuda.get_current_stream().synchronize()
             gpu_pred.get(out=cpu_pred)
             return np.transpose(cpu_pred, (1, 0, 2))
 
@@ -481,6 +482,7 @@ class Ensemble:
             for tree in self.models:
                 tree.predict(X, gpu_pred)
 
+            cp.cuda.get_current_stream().synchronize()
             self.postprocess_fn(gpu_pred).get(out=cpu_pred)
 
             return cpu_pred

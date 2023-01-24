@@ -126,6 +126,7 @@ class EnsembleInference:
 
         # special case handle if X is already on device
         if type(X) is cp.ndarray:
+            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             cpu_pred = np.empty((X.shape[0], self.n_out), dtype=cur_dtype)
             gpu_pred = cp.empty((X.shape[0], self.n_out), dtype=cur_dtype)
 
@@ -133,6 +134,7 @@ class EnsembleInference:
 
             self._predict_kernel(X, gpu_pred)
 
+            cp.cuda.get_current_stream().synchronize()
             self.postprocess_fn(gpu_pred).get(out=cpu_pred)
 
             return cpu_pred
