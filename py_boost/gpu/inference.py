@@ -122,7 +122,6 @@ class EnsembleInference:
 
         # special case handle if X is already on device
         if type(X) is cp.ndarray:
-            print("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDSA")
             cpu_pred = np.empty((X.shape[0], self.n_out), dtype=cur_dtype)
             gpu_pred = cp.empty((X.shape[0], self.n_out), dtype=cur_dtype)
 
