@@ -702,11 +702,17 @@ tree_prediction_kernel_alltogether = cp.RawKernel(
         const int* gr_out_indexes,
         const int n_features,
         const int n_out,
+        const int x_size,
+        const int n_gr,
         float* res)
     {
-        long long i_ = blockIdx.x * blockDim.y + threadIdx.y;
-        long long j_ = blockDim.x * blockIdx.y + threadIdx.x;
-
+        long long th = blockIdx.x * blockDim.x + threadIdx.x;
+        long long i_ = th / n_gr;
+        if (i_ >= x_size) {
+            return;
+        }
+        int j_ = (int)(th % n_gr) + blockIdx.y * n_gr;
+        
         long long x_feat_offset = n_features * i_;
         long long tree_offset = gr_subtree_offsets[j_];
 
