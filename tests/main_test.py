@@ -29,6 +29,7 @@ def test_reg(target_splitter, batch_size, params):
     # X_test[np.random.rand(X_test.shape[0], X_test.shape[1]) > 0.5] = np.nan
     # X_test[...] = np.nan
     # print(X_test)
+    X_test_gpu = cp.array(X_test, dtype=cp.float32)
 
     # exit()
 
@@ -41,10 +42,12 @@ def test_reg(target_splitter, batch_size, params):
 
     print("Testing leaves fast prob...")
     with nvtx.annotate("pred leaves fast prob"):
-        model.predict_leaves(X_test[:32 * 32], batch_size=batch_size)
+        # model.predict_leaves(X_test[:32 * 32], batch_size=batch_size)
+        model.predict_leaves(X_test_gpu[:32 * 32], batch_size=batch_size)
     print("Testing leaves fast...")
     with nvtx.annotate("pred leaves fast"):
-        lf = model.predict_leaves(X_test, batch_size=batch_size)
+        # lf = model.predict_leaves(X_test, batch_size=batch_size)
+        lf = model.predict_leaves(X_test_gpu, batch_size=batch_size)
 
     print("LLLL")
     print(lo.shape)
@@ -68,10 +71,12 @@ def test_reg(target_splitter, batch_size, params):
 
     print("Testing fast prob...")
     with nvtx.annotate("pred fast prob"):
-        model.predict(X_test[:32*32], batch_size=batch_size)
+        # model.predict(X_test[:32*32], batch_size=batch_size)
+        model.predict(X_test_gpu[:32*32], batch_size=batch_size)
     print("Testing fast...")
     with nvtx.annotate("pred fast"):
-        yp_fast = model.predict(X_test, batch_size=batch_size)
+        # yp_fast = model.predict(X_test, batch_size=batch_size)
+        yp_fast = model.predict(X_test_gpu, batch_size=batch_size)
 
     print("Creating new Inference class")
     with nvtx.annotate("new class creating"):
@@ -118,20 +123,23 @@ def test_reg(target_splitter, batch_size, params):
     plt.plot(yp_orig - yp_fast)
     plt.savefig('error_orig_vs_fast.png')
     plt.clf()
-    #
-    #
-    # print("Test staging")
-    # stages = [5, 15, 20, 61, 99]
-    # ps_orig = model._predict_staged_deprecated(X_test, iterations=stages, batch_size=100_000)
+
+
+    print("Test staging")
+    stages = [5, 15, 20, 61, 99]
+    ps_orig = model._predict_staged_deprecated(X_test, iterations=stages, batch_size=100_000)
     # ps_new = model.predict_staged(X_test, iterations=stages, batch_size=100_000)
-    #
-    # print("Difference between regular predict and staged predict (should be zero):")
-    # print("Old version:")
-    # print((ps_orig[4] - yp_fast).sum())
-    # print("New version:")
-    # print((ps_new[4] - yp_fast).sum())
-    # print("Shapes: (old, new)")
-    # print(ps_orig.shape, ps_new.shape)
+    ps_new = model.predict_staged(X_test_gpu, iterations=stages, batch_size=100_000)
+
+    print("Difference between regular predict and staged predict (should be zero):")
+    print("Old version:")
+    print((ps_orig[4] - yp_fast).sum())
+    print("New version:")
+    print((ps_new[4] - yp_fast).sum())
+    print("Shapes: (old, new)")
+    print(ps_orig.shape, ps_new.shape)
+    print("Diff (sjould be zero")
+    print((ps_orig[1] - ps_new[1]).sum())
     #
     #
     # print("Test feature importance")
@@ -168,7 +176,7 @@ if __name__ == '__main__':
     print(os.environ['CONDA_DEFAULT_ENV'])
 
     params = {
-        "x_size": 1050000,
+        "x_size": 105000,
         "feat_size": 50,
         "y_size": 16,
         "n_trees": 100
