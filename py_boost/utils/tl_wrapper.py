@@ -145,8 +145,8 @@ def convert_pb_to_treelite(model):
     Returns:
         treelite.ModelBuilder.Tree
     """
-    nfeats = int(max([tree.feats.max() for tree in model.models]) + 1)
-    ngroups = model.models[0].values.shape[1]
+    nfeats = model.nfeats
+    ngroups = model.models[0].ngroups
 
     builder = treelite.ModelBuilder(
         num_feature=nfeats,
