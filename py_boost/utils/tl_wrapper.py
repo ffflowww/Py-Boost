@@ -1,7 +1,7 @@
 import os
 
 import joblib
-import tqdm
+from tqdm import tqdm
 import treelite
 import treelite_runtime as tl_run
 
