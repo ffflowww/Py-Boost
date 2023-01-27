@@ -82,18 +82,19 @@ def parse_pb_tree(tree):
     while len(curr_nodes) > 0:
         old_id, new_id = curr_nodes.pop(0)
         curr_node, left, right = create_node(tree, old_id, new_id)
-        tl_tree[new_id]
+        print(curr_node, left, right)
+        # tl_tree[new_id]
         tl_tree[new_id].set_numerical_test_node(**curr_node)
 
         if left[0] >= 0:
             curr_nodes.append(left)
         else:
-            tl_tree[left[1]]
+            # tl_tree[left[1]]
             tl_tree[left[1]].set_leaf_node(tree.values[abs(left[0]) - 1])
         if right[0] >= 0:
             curr_nodes.append(right)
         else:
-            tl_tree[right[1]]
+            # tl_tree[right[1]]
             tl_tree[right[1]].set_leaf_node(tree.values[abs(right[0]) - 1])
 
     tl_tree[0].set_root()
