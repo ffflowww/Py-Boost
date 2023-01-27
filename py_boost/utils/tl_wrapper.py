@@ -154,7 +154,7 @@ def convert_pb_to_treelite(model):
         pred_transform='identity_multiclass' if ngroups > 1 else 'identity'
     )
 
-    for tree in tqdm.auto.tqdm(model.models):
+    for tree in tqdm(model.models):
         builder.append(parse_pb_tree(tree))
 
     # add bias tree
