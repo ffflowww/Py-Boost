@@ -48,7 +48,7 @@ def create_node(tree, node_id, id_gen):
     assert node_id >= 0
 
     feature_id = int(tree.new_format[node_id * 4])
-    nan_left = feature_id > 0
+    nan_left = feature_id < 0
     feature_id = abs(feature_id) - 1
 
     left = int(tree.new_format[node_id * 4 + 2])
@@ -165,7 +165,6 @@ def convert_pb_to_treelite(model):
 
     # add bias tree
     bias_tree = treelite.ModelBuilder.Tree()
-    bias_tree[0]
     bias_tree[0].set_numerical_test_node(**{
 
         'feature_id': 0,
@@ -177,7 +176,6 @@ def convert_pb_to_treelite(model):
     })
 
     for i in range(1, 3):
-        bias_tree[i]
         bias_tree[i].set_leaf_node(model.base_score)
 
     bias_tree[0].set_root()
