@@ -152,7 +152,7 @@ def convert_pb_to_treelite(model):
         treelite.ModelBuilder.Tree
     """
     nfeats = model.nfeats
-    ngroups = model.models[0].ngroups
+    ngroups = model.models[0].values.shape[1]
 
     builder = treelite.ModelBuilder(
         num_feature=nfeats,
