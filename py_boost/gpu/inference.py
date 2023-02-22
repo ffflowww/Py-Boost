@@ -1,6 +1,6 @@
 import numpy as np
 import cupy as cp
-from .utils import tree_prediction_kernel_alltogether, pinned_array
+from .utils import tree_prediction_kernel_alltogether, tree_prediction_kernel_alltogether2, pinned_array
 
 
 class EnsembleInference:
@@ -91,7 +91,7 @@ class EnsembleInference:
         if sz % threads != 0:
             blocks += 1
 
-        tree_prediction_kernel_alltogether((blocks, self.n_models), (threads,), ((X,
+        tree_prediction_kernel_alltogether2((blocks, self.n_models), (threads,), ((X,
                                                                                   self.all_trees,
                                                                                   self.all_tree_offsets,
                                                                                   self.all_values,
@@ -103,6 +103,29 @@ class EnsembleInference:
                                                                                   X.shape[0],
                                                                                   self.n_groups,
                                                                                   res)))
+
+    def _predict_kernel2(self, X, res):
+        """ CUDA kernel call for inference
+
+        Returns:
+
+        """
+
+        tree_prediction_kernel_alltogether2((X.shape[0], ), (self.n_models,), ((X,
+                                                                                   self.all_trees,
+                                                                                   self.all_tree_offsets,
+                                                                                   self.all_values,
+                                                                                   self.all_values_offset,
+                                                                                   self.all_out_sizes,
+                                                                                   self.all_out_indexes,
+                                                                                   self.n_feat,
+                                                                                   self.n_out,
+                                                                                   X.shape[0],
+                                                                                   self.n_groups,
+
+                                                                                   self.n_models,
+
+                                                                                   res)))
 
     def predict(self, X, batch_size=100000):
         """Make prediction for the feature matrix X
@@ -127,7 +150,7 @@ class EnsembleInference:
 
             gpu_pred[:] = self.base_score
 
-            self._predict_kernel(X, gpu_pred)
+            self._predict_kernel2(X, gpu_pred)
 
             cp.cuda.get_current_stream().synchronize()
             self.postprocess_fn(gpu_pred).get(out=cpu_pred)
