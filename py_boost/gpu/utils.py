@@ -707,7 +707,7 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
         const int x_size,
         const int n_gr,
         
-        const int n_models;
+        const int n_models,
         
         float* res)
     {
@@ -723,7 +723,7 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
         long long x_feat_offset = n_features * i_;
         
         if (threadIdx.x < n_features) {
-            sh_beg[threadIdx.x] = X[x_feat_offset + threadIdx.x]
+            sh_beg[threadIdx.x] = X[x_feat_offset + threadIdx.x];
         }
         
         int n_node;
