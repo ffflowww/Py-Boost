@@ -692,7 +692,6 @@ tree_prediction_kernel = cp.RawKernel(
 
 tree_prediction_kernel_alltogether2 = cp.RawKernel(
     r'''
-    extern __shared__ float x_sh[];
     extern "C" __global__
     void tree_prediction_kernel_alltogether2(
         const float* X,
@@ -711,6 +710,7 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
         
         float* res)
     {
+        extern __shared__ float x_sh[];
         long long th = blockIdx.x * blockDim.x + threadIdx.x;
         long long i_ = th;
         if (i_ >= x_size) {
