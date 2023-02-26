@@ -91,7 +91,7 @@ class EnsembleInference:
         if sz % threads != 0:
             blocks += 1
 
-        tree_prediction_kernel_alltogether2((blocks, self.n_models), (threads,), ((X,
+        tree_prediction_kernel_alltogether((blocks, self.n_models), (threads,), ((X,
                                                                                   self.all_trees,
                                                                                   self.all_tree_offsets,
                                                                                   self.all_values,
