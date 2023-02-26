@@ -715,7 +715,7 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
         
         long long x_feat_offset = n_features * i_;
         
-        if (threadIdx.x < n_features) {  # TODO: check if number of models less when features!!!
+        if (threadIdx.x < n_features) {  // TODO: check if number of models less when features!!!
             x_sh[threadIdx.x] = X[x_feat_offset + threadIdx.x];
         }
         
