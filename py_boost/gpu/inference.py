@@ -185,7 +185,7 @@ class EnsembleInference:
                 cpu_batch_free_event[nst] = stream.record(cp.cuda.Event(block=True))
 
                 gpu_pred[nst][:] = self.base_score
-                self._predict_kernel(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
+                self._predict_kernel2(gpu_batch[nst][:real_batch_len], gpu_pred[nst][:real_batch_len])
 
                 if k >= 2:
                     cpu_pred_full[i - 2 * batch_size: i - batch_size] = cpu_pred[nst][:batch_size]
