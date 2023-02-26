@@ -716,14 +716,11 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
         if (i_ >= x_size) {
             return;
         }
-        # shared mem init
-        float* sh_beg = (float*)x_sh;
-        float* sh_end = (float*)&x_sh[n_features];
         
         long long x_feat_offset = n_features * i_;
         
         if (threadIdx.x < n_features) {
-            sh_beg[threadIdx.x] = X[x_feat_offset + threadIdx.x];
+            x_sh[threadIdx.x] = X[x_feat_offset + threadIdx.x];
         }
         
         int n_node;
@@ -748,7 +745,7 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
                     nd = tree[tree_offset + n_node];
         
                     n_feat_raw = (int)nd.x;
-                    x = sh_beg[abs(n_feat_raw) - 1];
+                    x = x_sh[abs(n_feat_raw) - 1];
         
                     if (isnan(x)) {
                         n_node = (n_feat_raw > 0) ? (int)nd.w : (int)nd.z;
