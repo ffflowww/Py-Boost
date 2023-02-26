@@ -125,7 +125,7 @@ class EnsembleInference:
 
                                                                                    self.n_models,
 
-                                                                                   res)))
+                                                                                   res)), shared_mem=self.n_feat * 4)
 
     def predict(self, X, batch_size=100000):
         """Make prediction for the feature matrix X

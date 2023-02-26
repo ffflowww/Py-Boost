@@ -711,15 +711,11 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
         float* res)
     {
         extern __shared__ float x_sh[];
-        long long th = blockIdx.x * blockDim.x + threadIdx.x;
-        long long i_ = th;
-        if (i_ >= x_size) {
-            return;
-        }
+        long long i_ = blockIdx.x;
         
         long long x_feat_offset = n_features * i_;
         
-        if (threadIdx.x < n_features) {
+        if (threadIdx.x < n_features) {  # TODO: check if number of models less when features!!!
             x_sh[threadIdx.x] = X[x_feat_offset + threadIdx.x];
         }
         
