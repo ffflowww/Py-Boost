@@ -751,14 +751,14 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
                 }
         
                 // writing result
-                long long i_out_offset = i_ * n_out;
-                int k_ = (n_gr + 1) * i_m + real_gr;
-                int i_out = gr_out_sizes[k_];
-                int i_out_end = gr_out_sizes[k_ + 1];
-                long long value_offset = ((-n_node - 1) * n_out) + values_offset[i_m];
-                long long index_offset = n_out * i_m;
-                for(; i_out < i_out_end; ++i_out) {
-                    res[i_out_offset + gr_out_indexes[index_offset + i_out]] += values[value_offset + gr_out_indexes[index_offset + i_out]];
+                //long long i_out_offset = i_ * n_out;
+                //int k_ = (n_gr + 1) * i_m + real_gr;
+                //int i_out = gr_out_sizes[k_];
+                //int i_out_end = gr_out_sizes[k_ + 1];
+                //long long value_offset = ((-n_node - 1) * n_out) + values_offset[i_m];
+                //long long index_offset = n_out * i_m;
+                //for(; i_out < i_out_end; ++i_out) {
+                //    res[i_out_offset + gr_out_indexes[index_offset + i_out]] += values[value_offset + gr_out_indexes[index_offset + i_out]];
                 }
             }
         }
