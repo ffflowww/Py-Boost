@@ -715,6 +715,10 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
         
         long long x_feat_offset = n_features * i_;
         
+        if (threadIdx.x >= n_models) {
+            return;
+        }
+        
         if (threadIdx.x < n_features) {  // TODO: check if number of models less when features!!!
             x_sh[threadIdx.x] = X[x_feat_offset + threadIdx.x];
         }
@@ -725,41 +729,40 @@ tree_prediction_kernel_alltogether2 = cp.RawKernel(
         int n_feat_raw;
         long long j_;
         long long tree_offset;
+        int i_m = threadIdx.x;
         
         __syncthreads();
         
         
-        for (int i_m = 0; i_m < n_models; ++i_m) {
-            for (int real_gr = 0; real_gr < n_gr; ++real_gr) {
+        for (int real_gr = 0; real_gr < n_gr; ++real_gr) {
+        
+            j_ = i_m * n_gr + real_gr;
+            tree_offset = gr_subtree_offsets[j_];
+            n_node = 0;
             
-                j_ = i_m * n_gr + real_gr;
-                tree_offset = gr_subtree_offsets[j_];
-                n_node = 0;
-                
-                // going through the tree
-                while (n_node >= 0) {
-                    nd = tree[tree_offset + n_node];
-        
-                    n_feat_raw = (int)nd.x;
-                    x = x_sh[abs(n_feat_raw) - 1];
-        
-                    if (isnan(x)) {
-                        n_node = (n_feat_raw > 0) ? (int)nd.w : (int)nd.z;
-                    } else {
-                        n_node = (x > nd.y) ? (int)nd.w : (int)nd.z;
-                    }
+            // going through the tree
+            while (n_node >= 0) {
+                nd = tree[tree_offset + n_node];
+    
+                n_feat_raw = (int)nd.x;
+                x = x_sh[abs(n_feat_raw) - 1];
+    
+                if (isnan(x)) {
+                    n_node = (n_feat_raw > 0) ? (int)nd.w : (int)nd.z;
+                } else {
+                    n_node = (x > nd.y) ? (int)nd.w : (int)nd.z;
                 }
-        
-                // writing result
-                //long long i_out_offset = i_ * n_out;
-                //int k_ = (n_gr + 1) * i_m + real_gr;
-                //int i_out = gr_out_sizes[k_];
-                //int i_out_end = gr_out_sizes[k_ + 1];
-                //long long value_offset = ((-n_node - 1) * n_out) + values_offset[i_m];
-                //long long index_offset = n_out * i_m;
-                //for(; i_out < i_out_end; ++i_out) {
-                //    res[i_out_offset + gr_out_indexes[index_offset + i_out]] += values[value_offset + gr_out_indexes[index_offset + i_out]];
-                //}
+            }
+    
+            // writing result
+            long long i_out_offset = i_ * n_out;
+            int k_ = (n_gr + 1) * i_m + real_gr;
+            int i_out = gr_out_sizes[k_];
+            int i_out_end = gr_out_sizes[k_ + 1];
+            long long value_offset = ((-n_node - 1) * n_out) + values_offset[i_m];
+            long long index_offset = n_out * i_m;
+            for(; i_out < i_out_end; ++i_out) {
+                res[i_out_offset + gr_out_indexes[index_offset + i_out]] += values[value_offset + gr_out_indexes[index_offset + i_out]];
             }
         }
         
