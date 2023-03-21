@@ -423,7 +423,9 @@ class Ensemble:
             is_on_gpu = True
             if type(X) is not cp.ndarray:
                 is_on_gpu = False
-                X = cp.array(X, dtype=cp.float32)
+                X = cp.asarray(X, dtype=cp.float32)
+            print(f"Is on GPU X: {is_on_gpu}")
+            print(X.get())
             gpu_pred = cp.empty((X.shape[0], n_out), dtype=cp.float32)
             gpu_pred_leaves = cp.empty((X.shape[0], ngroups), dtype=cp.int32)
             with cp.cuda.Stream() as stream:
