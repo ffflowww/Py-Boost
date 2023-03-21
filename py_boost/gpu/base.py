@@ -424,17 +424,17 @@ class Ensemble:
             if type(X) is not cp.ndarray:
                 is_on_gpu = False
                 X = cp.array(X, dtype=cp.float32)
-            # TODO: what if float64 on device or even int
             gpu_pred = cp.empty((X.shape[0], n_out), dtype=cp.float32)
             gpu_pred_leaves = cp.empty((X.shape[0], ngroups), dtype=cp.int32)
+            with cp.cuda.Stream() as stream:
+                gpu_pred[:] = self.base_score
 
-            gpu_pred[:] = self.base_score
+                for tree in self.models:
+                    tree.predict(X, gpu_pred, gpu_pred_leaves)
 
-            for tree in self.models:
-                tree.predict(X, gpu_pred, gpu_pred_leaves)
-
-            cp.cuda.get_current_stream().synchronize()
-            pred = self.postprocess_fn(gpu_pred)
+                stream.synchronize()
+                pred = self.postprocess_fn(gpu_pred)
+                stream.synchronize()
             if is_on_gpu:
                 return pred
             return pred.get()
